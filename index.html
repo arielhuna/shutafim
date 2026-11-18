@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>המכולת שלנו</title>
+
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%D7%94%D7%9E%D7%9B%D7%95%D7%9C%D7%AA%20%D7%A9%D7%9C%D7%A0%D7%95%22%2C%22short_name%22%3A%22%D7%9E%D7%9B%D7%95%D7%9C%D7%AA%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23FAF6EE%22%2C%22theme_color%22%3A%22%233D5A35%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Femojis%2Fsvg%3Femoji%3D1f9fa%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <meta name="theme-color" content="#FAF6EE" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#121410" media="(prefers-color-scheme: dark)" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="המכולת" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    input, select { font: inherit; color: inherit; }
+    ul { list-style: none; }
+    a { color: inherit; text-decoration: none; }
+    [hidden] { display: none !important; }
+
+    :root {
+      --cream:#FAF6EE; --card:#FDFAF4; --olive:#3D5A35; --olive-mid:#4E7044; --olive-muted:#8FAA82;
+      --olive-soft:rgba(61,90,53,0.09); --terra:#C1502E; --terra-soft:rgba(193,80,46,0.10);
+      --ink:#1C1C1C; --ink-muted:#7A7A72; --border:rgba(61,90,53,0.14); --line:rgba(61,90,53,0.08);
+      --shadow-card:0 4px 8px rgba(61,90,53,0.10), 0 24px 48px rgba(61,90,53,0.09);
+      --pos:#2F6B2A; --neg:#B4442A; --field:rgba(255,255,255,.8); --field-focus:#fff;
+      --on-olive:#fff; --surface2:rgba(255,255,255,.55); --chip:rgba(255,255,255,.7); --edge:rgba(255,255,255,.9);
+      --glass:rgba(250,246,238,.72); --toast:rgba(38,52,33,.88); --scrim-rgb:20,24,16;
+      --wa-bg:#e7f6ec; --wa-ink:#1d7a43; --warn-bg:#fff2cc; --warn-ink:#8a5a00;
+      --spring:cubic-bezier(.2,.9,.25,1);
+    }
+    @media (prefers-color-scheme: dark) {
+      .dot { box-shadow:0 0 0 1.5px rgba(255,255,255,.18); }  /* stored roommate colors stay visible on dark */
+      :root {
+        --cream:#121410; --card:#1B1E18; --olive:#8DBA7E; --olive-mid:#A3CC95; --olive-muted:#5F7A55;
+        --olive-soft:rgba(141,186,126,.13); --terra:#E2795A; --terra-soft:rgba(226,121,90,.15);
+        --ink:#ECEAE3; --ink-muted:#9C9A90; --border:rgba(141,186,126,.18); --line:rgba(141,186,126,.10);
+        --shadow-card:0 1px 0 rgba(255,255,255,.04) inset, 0 12px 32px rgba(0,0,0,.35);
+        --pos:#8FD07F; --neg:#F08A6C; --field:rgba(255,255,255,.05); --field-focus:rgba(255,255,255,.09);
+        --on-olive:#10160D; --surface2:rgba(255,255,255,.035); --chip:rgba(255,255,255,.05); --edge:rgba(255,255,255,.05);
+        --glass:rgba(27,30,24,.72); --toast:rgba(52,66,46,.9); --scrim-rgb:0,0,0;
+        --wa-bg:rgba(37,211,102,.14); --wa-ink:#6fdc98; --warn-bg:rgba(240,192,96,.15); --warn-ink:#f0c060;
+      }
+    }
+    html { -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+    body { background:var(--cream); min-height:100vh; font-family:'Heebo',sans-serif; color:var(--ink); direction:rtl; padding:calc(28px + env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom)); line-height:1.5; transition:background-color .4s ease, color .4s ease; }
+    .app { width:100%; max-width:1140px; margin:0 auto; }
+
+    /* Header */
+    .header { text-align:center; padding-bottom:20px; animation:fadeDown .5s ease both; }
+    .header-icon { font-size:40px; line-height:1; display:block; margin-bottom:8px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.12)); }
+    .header h1 { font-family:'Frank Ruhl Libre',serif; font-weight:900; font-size:2.1rem; color:var(--olive); line-height:1.05; letter-spacing:-.015em; }
+    .header p { font-size:.82rem; color:var(--ink-muted); margin-top:5px; letter-spacing:.01em; }
+    .header-actions { margin-top:12px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; align-items:center; }
+    .me-tag { font-size:.8rem; color:var(--ink-muted); }
+    .offline-pill { display:none; font-size:.75rem; font-weight:700; color:var(--warn-ink); background:var(--warn-bg); border-radius:999px; padding:3px 10px; }
+    body.offline .offline-pill { display:inline-block; }
+
+    /* Layout */
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) 410px; gap:22px; align-items:start; }
+    .side { position:sticky; top:16px; }
+    .tabs { display:none; }
+    @media (max-width:900px) {
+      .layout { grid-template-columns:1fr; }
+      .side { position:static; }
+      .layout .card { animation:none; }
+      .tabs { display:flex; position:sticky; top:calc(8px + env(safe-area-inset-top)); z-index:5; margin-bottom:16px; padding:4px; border-radius:15px;
+              background:var(--glass); -webkit-backdrop-filter:blur(18px) saturate(180%); backdrop-filter:blur(18px) saturate(180%);
+              box-shadow:0 0 0 1px var(--border), 0 8px 24px rgba(0,0,0,.06); }
+      .tabs button { flex:1; padding:10px; border-radius:11px; font-weight:700; color:var(--ink-muted); position:relative; z-index:1; transition:color .3s var(--spring); }
+      .tabs button.on { color:var(--on-olive); }
+      .tab-ind { position:absolute; top:4px; bottom:4px; right:4px; width:calc(50% - 4px); border-radius:11px; background:var(--olive);
+                 box-shadow:0 2px 8px rgba(61,90,53,.25); transition:transform .42s var(--spring); }
+      body[data-tab="shop"] .tab-ind { transform:translateX(-100%); }
+      /* content enters from the side its tab sits on (spatial consistency) */
+      body[data-tab="exp"] .main { animation:inFromRight .28s var(--spring) both; }
+      body[data-tab="shop"] .side { animation:inFromLeft .28s var(--spring) both; }
+      .field, .item-input { font-size:16px; } /* 16px stops iOS zooming into inputs, without disabling pinch-zoom */
+      body[data-tab="exp"] .side { display:none; }
+      body[data-tab="shop"] .main { display:none; }
+    }
+
+    /* Card */
+    .card { background:var(--card); border-radius:22px; box-shadow:var(--shadow-card); outline:1.5px solid var(--edge); outline-offset:-1px; animation:fadeUp .5s .1s ease both; margin-bottom:20px; }
+    .card-pad { padding:18px; }
+    .card h2 { font-family:'Frank Ruhl Libre',serif; font-size:1.3rem; font-weight:900; color:var(--olive); margin-bottom:12px; line-height:1.15; letter-spacing:-.01em; }
+    .card-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+    .card-head h2 { margin-bottom:0; }
+    .sub-title { font-size:.7rem; font-weight:700; letter-spacing:.05em; color:var(--ink-muted); margin:18px 0 8px; }
+
+    /* Buttons & fields */
+    .btn { border-radius:12px; padding:9px 16px; font-weight:700; font-size:.9rem; background:var(--olive-soft); color:var(--olive); transition:background .15s, transform .12s; display:inline-flex; align-items:center; gap:5px; }
+    .btn:active { transform:scale(.97); }
+    .btn.primary { background:var(--olive); color:var(--on-olive); box-shadow:0 2px 6px rgba(61,90,53,.25); }
+    .btn.small { padding:5px 11px; font-size:.8rem; border-radius:9px; }
+    .btn.link { background:none; padding:4px 6px; color:var(--ink-muted); font-weight:600; font-size:.78rem; }
+    .btn.wa { background:var(--wa-bg); color:var(--wa-ink); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .field { width:100%; background:var(--field); border:1.5px solid var(--border); border-radius:13px; padding:10px 13px; outline:none; transition:border-color .2s, box-shadow .2s; }
+    .field.invalid, .field.invalid:focus { border-color:var(--terra); box-shadow:0 0 0 3px var(--terra-soft); }
+    .field:focus { border-color:var(--olive); box-shadow:0 0 0 3px rgba(61,90,53,.13); background:var(--field-focus); }
+    select.field { padding:8px 11px; }
+    label.f { display:block; font-size:.78rem; color:var(--ink-muted); margin-bottom:5px; font-weight:600; }
+    .grid3 { display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; }
+    @media (max-width:560px) { .grid3 { grid-template-columns:1fr 1fr; } .grid3 .span { grid-column:1/-1; } }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .chip { border:1.5px solid var(--border); border-radius:999px; padding:5px 13px; cursor:pointer; user-select:none; font-size:.9rem; background:var(--chip); }
+    .chip.on { background:var(--olive); border-color:var(--olive); color:var(--on-olive); font-weight:600; }
+    .hint { font-size:.8rem; color:var(--ink-muted); }
+    .calc-hint { font-size:.78rem; color:var(--olive); font-weight:700; min-height:1em; margin-top:3px; }
+
+    /* Balances */
+    .balances { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+    .bal { border:1.5px solid var(--border); border-radius:16px; padding:12px 14px; background:var(--surface2); }
+    .bal .n { font-weight:700; display:flex; align-items:center; gap:7px; }
+    .dot { width:10px; height:10px; border-radius:50%; flex:none; display:inline-block; }
+    .dot.sm { width:7px; height:7px; }
+    .bal .v { font-family:'Frank Ruhl Libre',serif; font-size:1.6rem; font-weight:900; margin-top:2px; }
+    .bal .s { font-size:.75rem; color:var(--ink-muted); }
+    .pos { color:var(--pos); } .neg { color:var(--neg); }
+    .amt { font-weight:800; unicode-bidi:isolate; white-space:nowrap; }
+
+    .debts li { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 0; border-top:1px solid var(--line); flex-wrap:wrap; }
+    .debts li:first-child { border-top:none; }
+    .debt-actions { display:flex; gap:6px; }
+    details.manual { margin-top:10px; }
+    details.manual summary { cursor:pointer; font-size:.8rem; color:var(--ink-muted); font-weight:600; list-style:none; }
+    details.manual summary::-webkit-details-marker { display:none; }
+    .manual-row { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:8px; margin-top:10px; align-items:end; }
+    @media (max-width:560px) { .manual-row { grid-template-columns:1fr 1fr; } }
+
+    /* Summary bars */
+    .summary { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:14px; }
+    @media (max-width:640px) { .summary { grid-template-columns:1fr; } }
+    .bars .row { display:grid; grid-template-columns:96px 1fr auto; gap:8px; align-items:center; font-size:.83rem; margin-bottom:7px; }
+    .bars .track { height:9px; background:var(--olive-soft); border-radius:99px; overflow:hidden; }
+    .bars .fill { height:100%; border-radius:99px; background:var(--olive); transition:width .4s ease; }
+    .bars .lbl { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* History */
+    .stats { display:flex; gap:22px; flex-wrap:wrap; margin-bottom:12px; }
+    .stats div { font-size:.75rem; color:var(--ink-muted); }
+    .stats b { display:block; font-family:'Frank Ruhl Libre',serif; font-size:1.3rem; color:var(--ink); }
+    .hist-tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .hist-tools select { width:auto; }
+    .hist li { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--line); }
+    .hist li:first-child { border-top:none; }
+    .hist li.month-h { padding:14px 0 4px; border-top:none; font-size:.72rem; font-weight:700; letter-spacing:.05em; color:var(--ink-muted); }
+    .hist .ic { width:36px; height:36px; border-radius:11px; display:grid; place-items:center; flex:none; background:var(--olive-soft); font-size:1.05rem; }
+    .hist .ic.pay { background:var(--terra-soft); }
+    .hist .body { flex:1; min-width:0; }
+    .hist .t { font-weight:700; overflow-wrap:anywhere; }
+    .hist .m { font-size:.8rem; color:var(--ink-muted); }
+    .hist .right { text-align:left; flex:none; }
+
+    .split-custom { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin-top:8px; }
+    .split-custom label { display:flex; align-items:center; gap:6px; font-size:.9rem; }
+    .split-custom .field { padding:6px 9px; }
+    .empty { padding:20px; text-align:center; font-size:.88rem; color:var(--ink-muted); line-height:1.6; }
+
+    /* ── Grocery list ── */
+    .input-area { padding:14px; border-bottom:1.5px solid var(--border); display:flex; gap:9px; align-items:center; background:linear-gradient(to bottom, var(--surface2), transparent); border-radius:22px 22px 0 0; }
+    .input-wrap { flex:1; min-width:0; }
+    .qty-wrap { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+    .qty-btn { width:28px; height:28px; border-radius:8px; background:var(--border); color:var(--olive); font-size:1.1rem; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .qty-display { font-size:.85rem; font-weight:700; color:var(--olive); min-width:18px; text-align:center; }
+    .item-input { width:100%; background:var(--field); border:1.5px solid var(--border); border-radius:13px; padding:11px 14px; font-family:'Frank Ruhl Libre',serif; font-size:1rem; outline:none; transition:border-color .2s, box-shadow .2s; }
+    .item-input::placeholder { color:var(--ink-muted); opacity:.65; }
+    .item-input:focus { border-color:var(--olive); box-shadow:0 0 0 3px rgba(61,90,53,.13); background:var(--field-focus); }
+    .item-input.duplicate { border-color:#D4A017 !important; box-shadow:0 0 0 3px rgba(212,160,23,.15) !important; }
+    .add-btn { width:44px; height:44px; flex-shrink:0; border-radius:13px; background:var(--olive); color:var(--on-olive); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(61,90,53,.25); transition:background .15s, transform .12s; }
+    .add-btn:active { transform:scale(.9); }
+    .dup-warning { display:none; font-size:.75rem; color:#9B7A00; padding:4px 14px 0; }
+    .dup-warning.show { display:block; }
+    .quick { padding:10px 14px 2px; display:none; }
+    .quick.show { display:block; }
+    .quick .lbl { font-size:.68rem; font-weight:700; letter-spacing:.05em; color:var(--ink-muted); margin-bottom:6px; }
+    .quick .chip { font-size:.82rem; padding:4px 11px; font-family:'Frank Ruhl Libre',serif; }
+    .quick .chip::before { content:'+ '; color:var(--olive-muted); font-family:'Heebo',sans-serif; }
+    .suggestions { display:none; position:absolute; background:var(--card); border:1.5px solid rgba(61,90,53,.22); border-radius:13px; box-shadow:0 8px 32px rgba(61,90,53,.18); z-index:1000; max-height:260px; overflow-y:auto; }
+    .suggestions.open { display:block; animation:dropIn .16s ease both; }
+    .suggestion-item { padding:10px 14px; font-family:'Frank Ruhl Libre',serif; cursor:pointer; border-bottom:1px solid rgba(61,90,53,.07); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; gap:8px; align-items:center; }
+    .suggestion-item .e { font-size:.95rem; flex:none; }
+    .suggestion-item:last-child { border-bottom:none; }
+    .suggestion-item:hover, .suggestion-item.active { background:rgba(61,90,53,.08); }
+    .suggestion-item mark { background:transparent; color:var(--olive); font-weight:700; }
+    .section + .section { border-top:1.5px solid var(--border); }
+    .section-header { display:flex; align-items:center; justify-content:space-between; padding:13px 16px 9px; gap:8px; }
+    .section-header-start { display:flex; align-items:center; gap:8px; }
+    .section-title { font-size:.68rem; font-weight:700; letter-spacing:.05em; color:var(--ink-muted); }
+    .badge { font-size:.68rem; font-weight:700; line-height:1.5; padding:0 7px; border-radius:20px; background:var(--olive); color:var(--on-olive); opacity:0; transform:scale(.7); transition:opacity .2s, transform .2s; }
+    .badge.show { opacity:1; transform:scale(1); }
+    .badge.bought { background:var(--olive-muted); }
+    .clear-btn { font-size:.72rem; font-weight:600; color:var(--ink-muted); padding:3px 9px; border-radius:8px; transition:background .15s, color .15s; }
+    .view-toggle { font-size:.72rem; font-weight:600; color:var(--ink-muted); padding:3px 9px; border-radius:8px; }
+    .item-list { padding-bottom:6px; }
+    .cat-h { display:flex; align-items:center; gap:7px; padding:10px 16px 4px; font-size:.74rem; font-weight:700; color:var(--olive); background:linear-gradient(to left, var(--olive-soft), transparent 70%); }
+    .cat-h .c { color:var(--ink-muted); font-weight:600; }
+    .item { position:relative; overflow:hidden; border-bottom:1px solid var(--line); }
+    .item .row { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--card); position:relative; z-index:1; touch-action:pan-y; }
+    .item.swiping .row { will-change:transform; }
+    .swipe-bg { position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; padding:0 20px; font-size:.82rem; font-weight:800; color:var(--on-olive); background:var(--olive); }
+    .item[data-dir="left"] .swipe-bg { background:var(--terra); }
+    .item[data-dir="left"] .sb-check, .item[data-dir="right"] .sb-del, .item:not([data-dir]) .swipe-bg span { visibility:hidden; }
+    .swipe-bg span { display:inline-flex; gap:6px; align-items:center; transition:transform .25s var(--spring), opacity .2s; opacity:.75; }
+    .item.armed .swipe-bg span { transform:scale(1.15); opacity:1; } /* hint: past this point, letting go commits */
+    .swipe-tip { margin:0 16px 8px; font-size:.75rem; color:var(--ink-muted); display:flex; gap:6px; align-items:center; }
+    .item:last-child { border-bottom:none; }
+    .item.removing { overflow:hidden; max-height:60px; animation:collapse .28s ease forwards; }
+    .toggle-btn { width:27px; height:27px; flex-shrink:0; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .toggle-btn .checkmark { opacity:0; transform:scale(.4); transition:opacity .18s, transform .18s; }
+    .item.bought .toggle-btn { border-color:var(--olive); background:var(--olive); }
+    .item.bought .toggle-btn .checkmark { opacity:1; transform:scale(1); }
+    .name-wrap { flex:1; min-width:0; position:relative; display:flex; align-items:center; gap:6px; }
+    .name { display:block; font-family:'Frank Ruhl Libre',serif; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color .2s; position:relative; }
+    .name::after { content:''; position:absolute; top:53%; right:0; left:0; height:1.5px; background:var(--ink-muted); transform-origin:right center; transform:scaleX(0); transition:transform .32s ease; }
+    .item.bought .name { color:var(--ink-muted); }
+    .item.bought .name::after { transform:scaleX(1); }
+    .item-qty { font-family:'Heebo',sans-serif; font-size:.75rem; font-weight:700; color:var(--on-olive); background:var(--olive-muted); border-radius:6px; padding:1px 7px; flex:none; cursor:pointer; user-select:none; }
+    .item-qty.one { background:transparent; color:var(--olive-muted); border:1px dashed var(--border); padding:0 6px; opacity:.55; line-height:1.3; }
+    .item.bought .item-qty { background:rgba(61,90,53,.25); cursor:default; }
+    .who { flex:none; opacity:.8; }
+    .delete-btn { width:30px; height:30px; flex-shrink:0; border-radius:9px; color:var(--ink-muted); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s, background .15s, color .15s; }
+    @media (hover:none) { .delete-btn { opacity:.45; } }
+    .bought-section { display:none; }
+    .bought-section.visible { display:block; }
+    .to-expense { margin:0 16px 14px; width:calc(100% - 32px); justify-content:center; }
+    .progress { height:4px; background:var(--olive-soft); margin:0 16px; border-radius:99px; overflow:hidden; display:none; }
+    .progress.show { display:block; }
+    .progress div { height:100%; background:var(--olive-muted); transition:width .4s ease; }
+
+    /* Modal */
+    .overlay { position:fixed; inset:0; background:rgba(var(--scrim-rgb), calc(var(--p, 0) * .38)); display:none; align-items:center; justify-content:center; padding:16px; z-index:50; }
+    .overlay.open { display:flex; }
+    .modal { background:var(--card); border-radius:22px; padding:20px; width:100%; max-width:420px; max-height:90vh; overflow:auto; box-shadow:0 24px 64px rgba(0,0,0,.25);
+             opacity:var(--p, 0); transform:translateY(calc((1 - var(--p, 0)) * 10px)) scale(calc(.96 + var(--p, 0) * .04)); }
+    .grabber { display:none; }
+    @media (max-width:600px) {
+      /* bottom sheet: comes from the bottom, leaves to the bottom, and can be dragged down */
+      .overlay { align-items:flex-end; padding:0; }
+      .modal { max-width:none; border-radius:24px 24px 0 0; padding:8px 20px calc(24px + env(safe-area-inset-bottom)); opacity:1;
+               transform:translateY(calc((1 - var(--p, 0)) * 100%)); max-height:85vh; }
+      .grabber { display:block; width:38px; height:5px; border-radius:3px; background:var(--border); margin:2px auto 10px; }
+      .sheet-head { touch-action:none; cursor:grab; }
+    }
+    .mem { display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); }
+    .mem:first-child { border-top:none; }
+
+    /* Lock screen */
+    #lockScreen { position:fixed; inset:0; background:var(--cream); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; padding:32px 16px; animation:fadeDown .4s ease both; }
+    #lockScreen.hidden { display:none; }
+    .lock-icon { font-size:52px; margin-bottom:16px; }
+    .lock-title { font-family:'Frank Ruhl Libre',serif; font-weight:900; font-size:1.9rem; color:var(--olive); margin-bottom:6px; }
+    .lock-sub { font-size:.84rem; color:var(--ink-muted); margin-bottom:28px; }
+    .lock-card { background:var(--card); border-radius:22px; box-shadow:var(--shadow-card); padding:28px 24px; width:100%; max-width:320px; display:flex; flex-direction:column; gap:14px; }
+    .lock-input { width:100%; background:var(--field); border:1.5px solid var(--border); border-radius:13px; padding:13px 16px; font-size:1.1rem; font-weight:700; text-align:center; outline:none; direction:ltr; }
+    .lock-input:focus { border-color:var(--olive); box-shadow:0 0 0 3px rgba(61,90,53,.13); background:var(--field-focus); }
+    .lock-input.wrong { border-color:var(--terra) !important; animation:shake .35s ease; }
+    .lock-btn { width:100%; padding:13px; border-radius:13px; background:var(--olive); color:var(--on-olive); font-size:1rem; font-weight:700; }
+    .lock-error { font-size:.8rem; color:var(--terra); text-align:center; min-height:1.2em; }
+
+    /* Status + toast */
+    #statusBar { position:fixed; bottom:18px; right:18px; display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--ink-muted); pointer-events:none; transition:opacity .8s ease; }
+    #statusDot { width:6px; height:6px; border-radius:50%; background:var(--olive-muted); }
+    #statusDot.connecting { animation:blink 1.1s ease infinite; }
+    #statusDot.error { background:var(--terra); }
+    #statusDot.ok { background:var(--olive); }
+    .toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--toast); -webkit-backdrop-filter:blur(16px) saturate(160%); backdrop-filter:blur(16px) saturate(160%); color:#fff; padding:11px 16px; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.18); font-size:.88rem; font-weight:600; opacity:0; transition:opacity .22s ease, transform .38s var(--spring); pointer-events:none; z-index:60; bottom:calc(18px + env(safe-area-inset-bottom)); display:flex; gap:12px; align-items:center; max-width:calc(100% - 32px); }
+    .toast.show { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+    .toast button { color:#fff; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+
+
+    /* ── Press feedback: instant on pointer-down, springy on release ── */
+    .btn, .chip, .add-btn, .qty-btn, .lock-btn, .toggle-btn, .clear-btn, .view-toggle, .item-qty {
+      transition:transform .32s var(--spring), background-color .15s, color .15s, border-color .15s, box-shadow .15s, opacity .15s; }
+    .btn:active, .chip:active, .add-btn:active, .qty-btn:active, .lock-btn:active, .clear-btn:active, .view-toggle:active, .item-qty:active { transform:scale(.95); transition-duration:60ms; }
+    .toggle-btn:active { transform:scale(.86); transition-duration:60ms; }
+    .item.bought .toggle-btn { color:var(--on-olive); }
+    .item.pop .toggle-btn .checkmark { animation:pop .38s var(--spring); }
+    @keyframes pop { 0% { transform:scale(.4); } 60% { transform:scale(1.15); } 100% { transform:scale(1); } }
+    @keyframes inFromRight { from { opacity:0; transform:translateX(14px); } to { opacity:1; transform:none; } }
+    @keyframes inFromLeft  { from { opacity:0; transform:translateX(-14px); } to { opacity:1; transform:none; } }
+    .amt, .bal .v, .stats b, .qty-display, .badge, .item-qty { font-variant-numeric:tabular-nums; }
+    .bal .v { transition:color .3s; }
+    :focus-visible { outline:2px solid var(--olive); outline-offset:2px; }
+    .field:focus-visible, .item-input:focus-visible, .lock-input:focus-visible { outline:none; }
+
+    /* ── Accessibility ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:1ms !important; animation-iteration-count:1 !important; transition-duration:1ms !important; scroll-behavior:auto !important; }
+      .toast, .toast.show { transform:translateX(-50%); }
+      .tab-ind { transition:none; }
+      .modal { transform:none !important; }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .tabs, .toast { -webkit-backdrop-filter:none; backdrop-filter:none; }
+      .tabs { background:var(--card); } .toast { background:#2f4229; }
+    }
+    @media (prefers-contrast: more) {
+      :root { --border:rgba(0,0,0,.45); --ink-muted:#4a4a44; --line:rgba(0,0,0,.2); }
+      .card, .tabs, .modal { outline:1.5px solid var(--ink); }
+    }
+    @media (hover: hover) {
+      .btn:hover { background:rgba(61,90,53,.16); }
+      .btn.primary:hover { background:var(--olive-mid); }
+      .btn.link:hover { color:var(--ink); }
+      .btn.link.danger:hover { color:var(--terra); background:var(--terra-soft); }
+      .qty-btn:hover { background:rgba(61,90,53,.22); }
+      .add-btn:hover { background:var(--olive-mid); }
+      .clear-btn:hover { background:var(--terra-soft); color:var(--terra); }
+      .view-toggle:hover { background:var(--olive-soft); color:var(--olive); }
+      .toggle-btn:hover { border-color:var(--olive-mid); box-shadow:0 0 0 3px rgba(61,90,53,.1); transform:scale(1.1); }
+      .item-qty:hover { background:var(--olive-mid); }
+      .item-qty.one:hover { opacity:1; color:var(--on-olive); background:var(--olive-mid); border-color:var(--olive-mid); }
+      .item:hover .delete-btn, .item:focus-within .delete-btn { opacity:1; }
+      .delete-btn:hover { background:var(--terra-soft); color:var(--terra); }
+      .lock-btn:hover { background:var(--olive-mid); }
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 60%{transform:translateX(7px)} 80%{transform:translateX(-4px)} }
+    .shake { animation:shake .35s ease; border-color:var(--terra) !important; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes dropIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes collapse { to{max-height:0;opacity:0;padding-top:0;padding-bottom:0} }
+    @keyframes slideIn { from{opacity:0;transform:translateX(14px)} to{opacity:1;transform:translateX(0)} }
+    @media (max-width:380px) { body{padding:20px 12px 64px} .header h1{font-size:1.8rem} }
+  </style>
+</head>
+<body data-tab="exp">
+
+<!-- Password screen -->
+<div id="lockScreen">
+  <span class="lock-icon">🔒</span>
+  <h1 class="lock-title">המכולת שלנו</h1>
+  <p class="lock-sub">הכנס סיסמה להמשך</p>
+  <div class="lock-card">
+    <input id="lockInput" class="lock-input" type="password" inputmode="numeric" placeholder="הכנס סיסמה" maxlength="20" autocomplete="off" />
+    <button id="lockBtn" class="lock-btn">כניסה</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
+<div class="app">
+  <header class="header">
+    <span class="header-icon">🧺</span>
+    <h1>המכולת שלנו</h1>
+    <p>קניות, הוצאות ומי חייב למי</p>
+    <div class="header-actions">
+      <span class="offline-pill">אין קליטה — נשמר ויסתנכרן אח״כ</span>
+      <span class="me-tag" id="meTag"></span>
+      <button class="btn small" id="membersBtn">👥 השותפים</button>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <span class="tab-ind" aria-hidden="true"></span>
+    <button data-tab="exp" class="on" role="tab" aria-selected="true">💸 הוצאות</button>
+    <button data-tab="shop" role="tab" aria-selected="false">🛒 קניות <span id="tabBadge"></span></button>
+  </div>
+
+  <div class="layout">
+    <!-- ═════════ Expenses ═════════ -->
+    <div class="main">
+      <section class="card card-pad" id="onboard" hidden>
+        <h2>בואו נתחיל</h2>
+        <p class="hint" style="margin-bottom:12px">הוסיפו את השותפים בדירה, ואז כל אחד יוכל לרשום מה קנה.</p>
+        <button class="btn primary" id="onboardBtn">הוספת שותפים</button>
+      </section>
+
+      <section class="card card-pad" id="balCard">
+        <h2>המצב כרגע</h2>
+        <div class="balances" id="balances"></div>
+        <div class="sub-title">איך סוגרים חשבון</div>
+        <ul class="debts" id="debts"></ul>
+        <details class="manual" id="manualBox">
+          <summary>＋ רישום העברה אחרת (החזר חלקי, ביט וכו׳)</summary>
+          <form class="manual-row" id="manualForm" autocomplete="off">
+            <div><label class="f">מי העביר</label><select class="field" id="mFrom"></select></div>
+            <div><label class="f">למי</label><select class="field" id="mTo"></select></div>
+            <div><label class="f">סכום ₪</label><input class="field" id="mAmt" type="text" inputmode="decimal" placeholder="0"></div>
+            <button class="btn primary" type="submit">רישום</button>
+          </form>
+        </details>
+      </section>
+
+      <section class="card card-pad" id="formCard">
+        <h2 id="formTitle">רישום קנייה</h2>
+        <form id="expForm" autocomplete="off">
+          <div class="grid3">
+            <div class="span"><label class="f" for="eTitle">מה נקנה</label><input class="field" type="text" id="eTitle" placeholder="סופר, חשבון חשמל, נוזל כלים..." required></div>
+            <div><label class="f" for="eAmt">סכום ₪</label><input class="field" type="text" id="eAmt" inputmode="decimal" placeholder="אפשר גם 45+12.9" required><div class="calc-hint" id="calcHint"></div></div>
+            <div><label class="f" for="eDate">תאריך</label><input class="field" type="date" id="eDate" required></div>
+          </div>
+          <div style="margin-top:12px"><label class="f">סוג</label><div class="chips" id="catChips"></div></div>
+          <div style="margin-top:14px"><label class="f">מי שילם</label><div class="chips" id="payerChips"></div></div>
+          <div style="margin-top:14px">
+            <label class="f">מתחלק בין <button type="button" class="btn link" id="splitModeBtn">חלוקה לא שווה</button></label>
+            <div class="chips" id="splitChips"></div>
+            <div class="split-custom" id="splitCustom" hidden></div>
+            <div class="hint" id="splitHint" style="margin-top:6px"></div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn primary" type="submit" id="saveBtn">שמירה</button>
+            <button class="btn" type="button" id="cancelEditBtn" hidden>ביטול</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card card-pad">
+        <div class="card-head">
+          <h2>היסטוריה וסיכום</h2>
+          <button class="btn small" id="exportBtn">⬇ ייצוא לאקסל</button>
+        </div>
+        <div class="hist-tools">
+          <select class="field" id="monthSel" aria-label="תקופה"></select>
+          <div class="chips" id="histFilter"></div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="summary" id="summary"></div>
+        <ul class="hist" id="hist"></ul>
+      </section>
+    </div>
+
+    <!-- ═════════ Grocery list ═════════ -->
+    <aside class="side">
+      <div class="card" style="position:relative">
+        <div class="input-area">
+          <div class="input-wrap">
+            <input id="itemInput" class="item-input" type="text" placeholder="הוסף פריט (או כמה, עם פסיקים)" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="שם הפריט" />
+          </div>
+          <div class="qty-wrap" aria-label="כמות">
+            <button class="qty-btn" id="qtyMinus" aria-label="הפחת כמות">−</button>
+            <span class="qty-display" id="qtyDisplay">1</span>
+            <button class="qty-btn" id="qtyPlus" aria-label="הגדל כמות">+</button>
+          </div>
+          <button id="addBtn" class="add-btn" aria-label="הוסף פריט">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.5V15.5M2.5 9H15.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="dup-warning" id="dupWarning">⚠️ פריט זה כבר ברשימה</div>
+        <div class="quick" id="quick"><div class="lbl">קונים הרבה</div><div class="chips" id="quickChips"></div></div>
+
+        <section class="section" style="margin-top:6px">
+          <div class="section-header">
+            <div class="section-header-start"><span class="section-title">לקנות</span><span class="badge" id="pendingBadge"></span></div>
+            <div>
+              <button class="view-toggle" id="groupToggle">לפי מחלקות</button>
+              <button class="clear-btn" id="clearPendingBtn">נקה הכל</button>
+            </div>
+          </div>
+          <div class="swipe-tip" id="swipeTip" hidden>👆 החליקו פריט ימינה כשקניתם, שמאלה כדי למחוק</div>
+          <div class="progress" id="progress"><div></div></div>
+          <ul class="item-list" id="pendingList"></ul>
+        </section>
+
+        <section class="section bought-section" id="boughtSection">
+          <div class="section-header">
+            <div class="section-header-start"><span class="section-title">נקנה</span><span class="badge bought" id="boughtBadge"></span></div>
+            <button class="clear-btn" id="clearBoughtBtn">נקה הכל</button>
+          </div>
+          <ul class="item-list" id="boughtList"></ul>
+          <button class="btn primary to-expense" id="toExpenseBtn">💸 רישום הנקנה כהוצאה</button>
+        </section>
+        <div id="suggestions" class="suggestions" role="listbox"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Members modal -->
+<div class="overlay" id="memOverlay">
+  <div class="modal" id="memSheet" role="dialog" aria-modal="true" aria-labelledby="memTitle">
+    <div class="sheet-head" id="sheetHead">
+    <div class="grabber" aria-hidden="true"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2 id="memTitle" style="font-family:'Frank Ruhl Libre',serif;color:var(--olive);font-size:1.3rem;letter-spacing:-.01em">השותפים בדירה</h2>
+      <button class="btn link" id="memClose">סגירה</button>
+    </div>
+    </div>
+    <div id="memList"></div>
+    <form id="memForm" style="display:flex;gap:8px;margin-top:12px" autocomplete="off">
+      <input class="field" type="text" id="memInput" placeholder="שם השותף" maxlength="30">
+      <button class="btn primary" type="submit">הוספה</button>
+    </form>
+    <div style="margin-top:18px">
+      <label class="f" for="meSel">מי אני (במכשיר הזה)</label>
+      <select class="field" id="meSel"></select>
+      <div class="hint" style="margin-top:4px">נבחר אוטומטית כמי ששילם, ומסומן ליד פריטים שהוספת.</div>
+    </div>
+  </div>
+</div>
+
+<div id="statusBar" role="status"><span id="statusDot" class="connecting"></span><span id="statusText">מתחבר...</span></div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastAct" hidden></button></div>
+
+<!-- Password (same as before) -->
+<script>
+  const PASSWORD = "259";
+  const lockScreen = document.getElementById("lockScreen");
+  const lockInput  = document.getElementById("lockInput");
+  const lockError  = document.getElementById("lockError");
+  function unlock() {
+    if (lockInput.value === PASSWORD) {
+      localStorage.setItem("makolet_auth", "1");
+      lockScreen.classList.add("hidden");
+    } else {
+      lockError.textContent = "סיסמה שגויה, נסה שוב";
+      lockInput.classList.remove("wrong"); void lockInput.offsetWidth; lockInput.classList.add("wrong");
+      lockInput.value = ""; lockInput.focus();
+      lockInput.addEventListener("animationend", () => lockInput.classList.remove("wrong"), { once: true });
+    }
+  }
+  if (localStorage.getItem("makolet_auth") === "1") lockScreen.classList.add("hidden");
+  else lockInput.focus();
+  document.getElementById("lockBtn").addEventListener("click", unlock);
+  lockInput.addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+    collection, addDoc, setDoc, updateDoc, deleteDoc,
+    doc, onSnapshot, query, orderBy, serverTimestamp, writeBatch
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBFCFAHoR3-qgtb6HIhV2x1HcfiHk6px7A",
+    authDomain:        "grocery-roommates.firebaseapp.com",
+    projectId:         "grocery-roommates",
+    storageBucket:     "grocery-roommates.firebasestorage.app",
+    messagingSenderId: "220982133570",
+    appId:             "1:220982133570:web:e0e6e5ca5225a13564fedb"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  // Offline cache: the list keeps working in the supermarket with no reception, and syncs later
+  let db;
+  try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
+  catch (e) { db = initializeFirestore(app, {}); }
+  const groceriesCol = collection(db, "groceries");
+
+  /* ───────────── helpers ───────────── */
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const fmt = new Intl.NumberFormat("he-IL", { style:"currency", currency:"ILS", minimumFractionDigits:0, maximumFractionDigits:2 });
+  const money = ag => fmt.format(ag / 100);
+  const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+  const MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+  const monthLabel = ym => { const [y,m] = String(ym).split("-"); return esc(`${MONTHS[+m-1] || ""} ${y || ""}`); };
+  const COLORS = ["#3D5A35","#C1502E","#2E5E8C","#B8860B","#7B3F8C","#2A7F7A","#8C5A3C","#5A6B7A"];
+  const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
+  // Anything read from Firestore is untrusted: colors must be plain hex, numbers must be numbers
+  const safeColor = c => /^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : "#999999";
+  const MAX_AMOUNT = 10000000; // agorot (₪100,000) — same cap as firestore.rules
+  const isAmt = v => typeof v === "number" && Number.isFinite(v) && v > 0;
+  const isStr = v => typeof v === "string" && v.length > 0;
+  const VALID = {
+    members:     d => isStr(d.name),
+    expenses:    d => isStr(d.title) && isAmt(d.amount) && isStr(d.paidBy),
+    settlements: d => isStr(d.from) && isStr(d.to) && isAmt(d.amount),
+    groceries:   d => isStr(d.name),
+  };
+  // Fire-and-forget write: Firestore applies it locally right away (also offline) and syncs later.
+  // Awaiting it would block until the server confirms, which never happens without reception.
+  const write = p => { p.catch(onErr); };
+
+  // Amount calculator: "45+12.9-3*2" → agorot. Only digits . + - * / ( ) allowed.
+  function calc(str) {
+    const s = String(str || "").replace(/,/g, ".").replace(/[₪\s]/g, "");
+    if (!s || !/^[\d.+\-*/()]+$/.test(s)) return NaN;
+    let i = 0;
+    const num = () => { const m = s.slice(i).match(/^\d*\.?\d+|^\d+\./); if (!m) throw 0; i += m[0].length; return parseFloat(m[0]); };
+    const factor = () => { if (s[i] === "-") { i++; return -factor(); } if (s[i] === "(") { i++; const v = expr(); if (s[i] !== ")") throw 0; i++; return v; } return num(); };
+    const term = () => { let v = factor(); while (s[i] === "*" || s[i] === "/") { const op = s[i++]; const r = factor(); v = op === "*" ? v * r : v / r; } return v; };
+    const expr = () => { let v = term(); while (s[i] === "+" || s[i] === "-") { const op = s[i++]; const r = term(); v = op === "+" ? v + r : v - r; } return v; };
+    try { const v = expr(); if (i !== s.length || !isFinite(v)) return NaN; return Math.round(v * 100); } catch (e) { return NaN; }
+  }
+
+  /* ───────────── motion: springs, momentum, rubber-band, haptics ─────────────
+     Springs are described the way Apple does: response (s) + damping ratio.
+     They start from the current on-screen value and carry velocity, so any animation can be grabbed mid-flight. */
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  function spring({ from, to, velocity = 0, response = 0.35, damping = 1, onUpdate, onDone }) {
+    let x = from, v = velocity, stopped = false, raf;
+    if (reducedMotion.matches) { onUpdate(to); onDone && onDone(); return { stop() {}, get value() { return to; } }; }
+    const k = (2 * Math.PI / response) ** 2, c = 4 * Math.PI * damping / response;
+    let last = performance.now();
+    const step = now => {
+      if (stopped) return;
+      const dt = Math.min((now - last) / 1000, 0.064); last = now;
+      const n = Math.max(1, Math.ceil(dt / 0.004)), h = dt / n;
+      for (let i = 0; i < n; i++) { v += (-k * (x - to) - c * v) * h; x += v * h; }
+      const scale = Math.max(1, Math.abs(to - from));
+      if (Math.abs(v) < scale * 0.02 && Math.abs(x - to) < scale * 0.002) { x = to; onUpdate(x); onDone && onDone(); return; }
+      onUpdate(x); raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return { stop() { stopped = true; cancelAnimationFrame(raf); }, get value() { return x; }, get velocity() { return v; } };
+  }
+  // Where a flick would come to rest (Apple's deceleration projection)
+  const project = (v, d = 0.99) => (v / 1000) * d / (1 - d);
+  // Soft boundary: the further past it, the less the content follows
+  const rubberband = (over, dim, c = 0.55) => (over * dim * c) / (dim + c * Math.abs(over));
+  // Velocity (px/s) from the last ~100ms of pointer samples
+  function velocityOf(hist, key) {
+    const now = hist.length ? hist[hist.length - 1].t : 0;
+    const recent = hist.filter(p => now - p.t < 100);
+    if (recent.length < 2) return 0;
+    const a = recent[0], b = recent[recent.length - 1];
+    return b.t > a.t ? (b[key] - a[key]) / (b.t - a.t) * 1000 : 0;
+  }
+  // Haptics only on meaningful moments (commit points, check-off) — and on the same frame as the visual
+  const haptic = (ms = 8) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+
+  let toastTimer;
+  function toast(msg, actLabel, actFn, ms = 2400) {
+    $("toastMsg").textContent = msg;
+    const b = $("toastAct");
+    if (actLabel) { b.hidden = false; b.textContent = actLabel; b.onclick = () => { $("toast").classList.remove("show"); actFn(); }; }
+    else b.hidden = true;
+    $("toast").classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").classList.remove("show"), actLabel ? 5000 : ms);
+  }
+
+  /* ───────────── tabs, status, offline ───────────── */
+  document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+  function setTab(t) {
+    document.body.dataset.tab = t; store.set("makolet_tab", t);
+    document.querySelectorAll(".tabs button").forEach(b => { b.classList.toggle("on", b.dataset.tab === t); b.setAttribute("aria-selected", b.dataset.tab === t); });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  if (store.get("makolet_tab") === "shop") setTab("shop");
+
+  const syncOnline = () => document.body.classList.toggle("offline", !navigator.onLine);
+  window.addEventListener("online", syncOnline); window.addEventListener("offline", syncOnline); syncOnline();
+
+  let fadeTimer;
+  function setStatus(s) {
+    clearTimeout(fadeTimer); $("statusBar").style.opacity = "1"; $("statusDot").className = "";
+    if (s === "ok") { $("statusDot").classList.add("ok"); $("statusText").textContent = "מחובר"; fadeTimer = setTimeout(() => $("statusBar").style.opacity = "0", 2500); }
+    else if (s === "error") { $("statusDot").classList.add("error"); $("statusText").textContent = "שגיאת חיבור"; }
+    else { $("statusDot").classList.add("connecting"); $("statusText").textContent = "מתחבר..."; }
+  }
+  function onErr(e) {
+    console.error(e);
+    if (e && e.code === "permission-denied") toast("אין הרשאה במסד הנתונים — צריך לעדכן את חוקי Firestore");
+    else toast("משהו נכשל, נסו שוב");
+    setStatus("error");
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     GROCERY CATALOG — categories in supermarket-aisle order
+     ═══════════════════════════════════════════════════════════ */
+  const CATS = [
+    { k:"veg", n:"פירות וירקות", e:"🥬", items:"תפוח|תפוח עץ|תפוח ירוק|תפוחי עץ|בננה|בננות|לימון|לימונים|ליים|תפוז|תפוזים|קלמנטינה|קלמנטינות|אשכולית|פומלה|אגס|ענבים|אבוקדו|מנגו|אבטיח|מלון|תמרים|רימון|תותים|תות שדה|קיווי|אפרסק|נקטרינה|שזיף|שזיפים|דובדבנים|אננס|פפאיה|אפרסמון|פסיפלורה|ליצ'י|תאנים|אוכמניות|עגבנייה|עגבניות|עגבניות שרי|מלפפון|מלפפונים|גזר|בצל|בצל סגול|בצל ירוק|שום|תפוח אדמה|תפוחי אדמה|בטטה|פלפל|פלפל אדום|פלפל צהוב|פלפל ירוק|פלפל חריף|קישוא|קישואים|חסה|חסה ערבית|חסה אייסברג|ברוקולי|כרובית|כרוב|כרוב סגול|תרד|עלי בייבי|סלרי|צנונית|כרישה|חציל|חצילים|פטריות|פטריות שמפיניון|פטריות פורטובלו|דלעת|דלורית|אספרגוס|תירס|קלח תירס|שעועית ירוקה|אפונה|עירית|פטרוזיליה|כוסברה|שמיר|בזיליקום|נענע|רוקט|ג'ינג'ר|סלק|קולרבי|לפת|נבטים|ארטישוק|סלט ירקות|ירקות חתוכים|אבוקדו האס" },
+    { k:"dairy", n:"חלב, גבינות וביצים", e:"🥛", items:"חלב|חלב 3%|חלב 1%|חלב דל לקטוז|חלב בקרטון|ביצים|ביצים L|ביצים M|ביצים XL|ביצי חופש|חמאה|חמאה מלוחה|שמנת מתוקה|שמנת לבישול|שמנת חמוצה|שמנת להקצפה|יוגורט|יוגורט יווני|יוגורט פירות|יופלה|דנונה|מילקי|פודינג|קוטג'|קוטג' 5%|גבינה לבנה|גבינה לבנה 5%|גבינה לבנה 9%|גבינה צהובה|גבינה צהובה פרוסה|גבינה צהובה מגורדת|גבינה בולגרית|גבינה מלוחה|פטה|מוצרלה|מוצרלה טרייה|פרמזן|גאודה|עמק|לבן|לבנה|אשל|שוקו|שוקו בשקית|קפיר|ריקוטה|קממבר|ברי|גבינת עיזים|גבינת שמנת|נעמה|טבורוג|מעדן חלב|גבינת שמנת לצלחת|חלב סויה|חלב שיבולת שועל|חלב שקדים|משקה אורז|תחליף חלב|מרגרינה|יוגורט חלבון|גו|פרו" },
+    { k:"bread", n:"לחם ומאפים", e:"🍞", items:"לחם|לחם אחיד|לחם פרוס|לחם מלא|לחם שיפון|לחם כוסמין|לחם מחמצת|לחם ללא גלוטן|חלה|חלות|פיתות|פיתה|לאפות|לאפה|טורטיות|טורטיה|לחמניות|לחמניות המבורגר|לחמניות נקניקייה|בגט|באגט|קרואסון|קרואסונים|מצות|לחם טוסט|קרקרים|פריכיות|גריסיני|בייגלה|עוגה|עוגת שיש|רוגלך|בורקס|מאפינס|לחמניות מתוקות|ג'בטה|פוקצ'ה|בייגל" },
+    { k:"meat", n:"בשר, עוף ודגים", e:"🍗", items:"עוף|חזה עוף|שוקיים|שוקי עוף|כנפיים|כנפי עוף|עוף שלם|פרגיות|שניצל|שניצלים|כבד עוף|הודו|חזה הודו|כרעיים|ירכיים|בשר טחון|בקר טחון|בשר בקר|אנטריקוט|סטייק|צלי כתף|אסאדו|צלעות|קבב|המבורגר|המבורגרים|נקניקיות|נקניק|סלמי|פסטרמה|פסטרמה הודו|נקניק הודו|שווארמה|סלמון|פילה סלמון|דניס|לברק|אמנון|מושט|שרימפס|פילה דג|קציצות|קציצות דגים|כבד|שקדי עגל|נתחי עוף|שיפודים|גולש|בשר לגולש|כתף בקר|פילה בקר" },
+    { k:"frozen", n:"קפואים", e:"🧊", items:"גלידה|ארטיק|ארטיקים|קרטיב|פיצה קפואה|ירקות קפואים|אפונה קפואה|תירס קפוא|שעועית קפואה|ברוקולי קפוא|כרובית קפואה|תרד קפוא|תותים קפואים|פירות קפואים|פירות יער קפואים|צ'יפס|צ'יפס קפוא|שניצל קפוא|נאגטס|בורקס קפוא|מלאווח|ג'חנון|בצק עלים|בצק פילו|פיש אנד צ'יפס|בלינצ'ס|קובה|קרח|קוביות קרח|אדממה|כופתאות|מוקפץ קפוא|לביבות|שניצל תירס|מלוואח" },
+    { k:"dry", n:"יבשים ושימורים", e:"🥫", items:"אורז|אורז בסמטי|אורז יסמין|אורז מלא|אורז פרסי|פסטה|ספגטי|פנה|פוזילי|לזניה|נודלס|אטריות|אטריות אורז|קוסקוס|פתיתים|בורגול|קינואה|עדשים|עדשים כתומות|עדשים שחורות|חומוס יבש|גרגרי חומוס|שעועית לבנה|שעועית אדומה|כוסמת|גריסים|שיבולת שועל|קוואקר|קורנפלקס|דגני בוקר|כריות|גרנולה|קמח|קמח לבן|קמח מלא|קמח תופח|סוכר|סוכר חום|אבקת סוכר|ממתיק|אבקת אפייה|סודה לשתייה|שמרים|קקאו|תמצית וניל|סוכר וניל|שוקולד צ'יפס|קורנפלור|פודינג אינסטנט|שמן|שמן זית|שמן קנולה|שמן חמניות|ספריי שמן|שמן קוקוס|טונה|טונה בשמן|טונה במים|תירס בקופסה|תירס שימורים|רסק עגבניות|עגבניות מרוסקות|עגבניות קלופות|שימורי חומוס|שימורי שעועית|זיתים|זיתים ירוקים|זיתים שחורים|חמוצים|מלפפונים חמוצים|כרוב כבוש|פטריות בקופסה|אפונה וגזר|ממרח שוקולד|נוטלה|חמאת בוטנים|ריבה|ריבת חלב|דבש|סילאן|חלבה|טחינה|טחינה גולמית|חומוס מוכן|מטבוחה|חציל במיונז|סלט חצילים|אגוזים|אגוזי מלך|שקדים|קשיו|בוטנים|צימוקים|חמוציות|תמרים מיובשים|זרעי צ'יה|זרעי פשתן|שומשום|פירורי לחם|פירורי פנקו|שקדי מרק|אבקת מרק|אבקת מרק עוף|מרק עוף|מרק אינסטנט|פופקורן לבישול|קרם קוקוס|חלב קוקוס" },
+    { k:"spice", n:"תבלינים ורטבים", e:"🧂", items:"מלח|מלח גס|מלח לימון|פלפל שחור|כמון|פפריקה|פפריקה מתוקה|פפריקה חריפה|כורכום|קינמון|אורגנו|טימין|רוזמרין|זעתר|הל|בהרט|ראס אל חנות|ג'ינג'ר טחון|אבקת שום|אבקת בצל|עלי דפנה|צ'ילי|צ'ילי גרוס|אגוז מוסקט|ציפורן|חרדל|חרדל דיז'ון|קטשופ|מיונז|מיונז לייט|חומץ|חומץ בלסמי|חומץ תפוחים|רוטב סויה|טריאקי|רוטב צ'ילי מתוק|סריראצ'ה|רוטב ברביקיו|רוטב עגבניות|רוטב פסטה|פסטו|חריסה|סחוג|עמבה|רוטב סלט|ויניגרט|מיץ לימון|רוטב צ'ימיצ'ורי|רוטב שום|רוטב אלף האיים|ציר עוף|קוביות ציר" },
+    { k:"drinks", n:"שתייה, קפה ותה", e:"☕", items:"מים|מים מינרליים|שישיית מים|בקבוקי מים|סודה|מים מוגזים|מיץ|מיץ תפוזים|מיץ תפוחים|מיץ ענבים|מיץ רימונים|מיץ גזר|פריגת|תפוזינה|קולה|קוקה קולה|קולה זירו|ספרייט|פאנטה|פיוז טי|נביעות|לימונדה|תה|תה ירוק|תה קמומיל|שקיות תה|קפה|קפה טורקי|קפה שחור|נס קפה|קפה נמס|קפסולות קפה|קפסולות|פולי קפה|קפה טחון|אבקת שוקו|סירופ|תרכיז|משקה אנרגיה|רד בול|בירה|יין|יין אדום|יין לבן|ערק|וודקה|ויסקי|תירוש|קוואס|משקה איזוטוני|קפה קר" },
+    { k:"snacks", n:"חטיפים ומתוקים", e:"🍫", items:"שוקולד|שוקולד מריר|שוקולד חלב|שוקולד לבן|במבה|ביסלי|אפרופו|תפוצ'יפס|צ'יפס שקית|דוריטוס|פרינגלס|פופקורן|בייגלה מלוח|גרעינים|פיצוחים|חטיף אנרגיה|חטיפי דגנים|חטיפי חלבון|עוגיות|עוגיות שוקולד צ'יפס|וופלים|אוריאו|קליק|מקופלת|פסק זמן|כיף כף|טוויקס|סניקרס|קינדר|סוכריות|מסטיקים|גומי|סוכריות גומי|קרמבו|חטיף אורז|חלבה|עוגת שמרים|ביסקוויטים|פתי בר|גלידה במקל|מרשמלו|חטיפים" },
+    { k:"clean", n:"ניקיון ובית", e:"🧽", items:"אבקת כביסה|ג'ל כביסה|נוזל כביסה|מרכך כביסה|קפסולות כביסה|נוזל כלים|סבון כלים|טבליות למדיח|ג'ל למדיח|מלח למדיח|נייר טואלט|מגבות נייר|מפיות|טישו|ממחטות|ספוג|ספוגים|ספוג ברזל|מטליות|מטליות מיקרופייבר|מגב|סמרטוט רצפה|שקיות אשפה|שקיות זבל|שקיות זבל גדולות|שקיות סנדוויץ'|שקיות הקפאה|נייר כסף|רדיד אלומיניום|ניילון נצמד|נייר אפייה|חומר ניקוי|נוזל לרצפה|סנו|אקונומיקה|כלור|מסיר שומנים|מסיר אבנית|ניקוי חלונות|ניקוי שירותים|ניקוי אמבטיה|אבן לאסלה|מטהר אוויר|נורה|נורות|סוללות|גפרורים|מצית|כפפות ניקוי|צלחות חד פעמיות|כוסות חד פעמיות|סכו\"ם חד פעמי|תבניות אלומיניום|קיסמים|נרות|נרות שבת|נרות נשמה|ספריי נגד יתושים|דוחה יתושים|תכשיר נגד נמלים" },
+    { k:"toilet", n:"טואלטיקה ופארם", e:"🧴", items:"שמפו|מרכך שיער|סבון|סבון ידיים|סבון נוזלי|ג'ל רחצה|דאודורנט|משחת שיניים|מברשת שיניים|מברשות שיניים|חוט דנטלי|מי פה|קצף גילוח|ג'ל גילוח|סכיני גילוח|סכין גילוח|תחליב גוף|קרם ידיים|קרם הגנה|קרם פנים|מקלוני אוזניים|צמר גפן|פלסטרים|אקמול|נורופן|אופטלגין|ויטמינים|ג'ל לשיער|ווקס לשיער|ספריי לשיער|מגבונים|מגבונים לחים|פדים|טמפונים|תחבושות היגייניות|ליפסטיק|שפתון לחות|קונדישנר|מסיר איפור|מסכה לשיער|גומיות שיער" },
+  ];
+  const OTHER = { k:"other", n:"אחר", e:"📦" };
+  const CAT_BY_KEY = Object.fromEntries([...CATS, OTHER].map(c => [c.k, c]));
+  const CATALOG = []; const CAT_OF = new Map();
+  CATS.forEach(c => c.items.split("|").forEach(name => { if (!CAT_OF.has(name)) { CAT_OF.set(name, c.k); CATALOG.push(name); } }));
+
+  function categorize(name) {
+    const n = String(name || "").trim();
+    if (CAT_OF.has(n)) return CAT_OF.get(n);
+    let best = null, len = 0;
+    for (const entry of CATALOG) {
+      if ((n.includes(entry) || entry.startsWith(n)) && entry.length > len && n.length >= 2) { best = entry; len = entry.length; }
+    }
+    return best ? CAT_OF.get(best) : "other";
+  }
+  const catOf = item => (item.cat && CAT_BY_KEY[item.cat]) ? item.cat : categorize(item.name);
+
+  /* ═══════════════════════════════════════════════════════════
+     EXPENSES
+     ═══════════════════════════════════════════════════════════ */
+  const ECATS = [
+    { k:"super", n:"סופר", e:"🛒" }, { k:"home", n:"ניקיון ובית", e:"🧽" }, { k:"bills", n:"חשבונות", e:"💡" },
+    { k:"food", n:"אוכל בחוץ / משלוח", e:"🍕" }, { k:"apt", n:"לדירה", e:"🛋️" }, { k:"other", n:"אחר", e:"📦" },
+  ];
+  const ECAT = Object.fromEntries(ECATS.map(c => [c.k, c]));
+  const ecatOf = e => ECAT[e.category] ? e.category : "super";
+
+  const state = { members: [], expenses: [], settlements: [] };
+  // Grocery state lives up here too, so every render function can safely use it
+  let currentQty = 1, currentItems = [], grouped = store.get("makolet_grouped") !== "0";
+  const knownIds = new Set(), sessionNames = new Set(), justToggled = new Set();
+  const swipe = { active: null, cand: null, pending: false, blockClick: false }; // a row being dragged is never re-rendered under the finger
+
+  // how often each item is added on this device → "קונים הרבה"
+  const freq = (() => { try { return JSON.parse(store.get("makolet_freq") || "{}"); } catch (e) { return {}; } })();
+  const bumpFreq = name => { freq[name] = (freq[name] || 0) + 1; store.set("makolet_freq", JSON.stringify(freq)); };
+
+  let editingId = null, customSplit = false, fromBought = null, histFilter = "all", monthFilter = today().slice(0,7);
+  let selPayer = null, selSplit = null, splitTouched = false, selCat = "super";
+
+  ["members","expenses","settlements"].forEach(name => {
+    onSnapshot(collection(db, name), snap => {
+      state[name] = snap.docs.map(d => ({ ...d.data(), id: d.id })).filter(VALID[name]);
+      renderExpenses(); if (name === "members") renderList(currentItems);
+      setStatus("ok");
+    }, onErr);
+  });
+
+  const members = () => [...state.members].sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  const mName = id => (state.members.find(m => m.id === id) || {}).name || "שותף שנמחק";
+  const mColor = id => safeColor((state.members.find(m => m.id === id) || {}).color);
+  const me = () => { const v = store.get("makolet_me"); return state.members.some(m => m.id === v) ? v : null; };
+
+  function shares(e) {
+    if (e.custom && typeof e.custom === "object") return { ...e.custom };
+    const ids = e.splitAmong || [], n = ids.length, out = {};
+    if (!n) return out;
+    const base = Math.floor(e.amount / n); let rem = e.amount - base * n;
+    ids.forEach(id => { out[id] = base + (rem > 0 ? 1 : 0); if (rem > 0) rem--; });
+    return out;
+  }
+  function balances() {
+    const b = {}; const ensure = id => b[id] ||= { net:0, paid:0 };
+    state.members.forEach(m => ensure(m.id));
+    state.expenses.forEach(e => {
+      ensure(e.paidBy).net += e.amount; b[e.paidBy].paid += e.amount;
+      Object.entries(shares(e)).forEach(([id,a]) => ensure(id).net -= a);
+    });
+    state.settlements.forEach(s => { ensure(s.from).net += s.amount; ensure(s.to).net -= s.amount; });
+    return b;
+  }
+  function simplify(b) {
+    const cred = [], debt = [];
+    Object.entries(b).forEach(([id,v]) => { if (v.net > 0) cred.push({id,a:v.net}); else if (v.net < 0) debt.push({id,a:-v.net}); });
+    cred.sort((x,y) => y.a - x.a); debt.sort((x,y) => y.a - x.a);
+    const out = []; let i = 0, j = 0;
+    while (i < debt.length && j < cred.length) {
+      const a = Math.min(debt[i].a, cred[j].a);
+      if (a > 0) out.push({ from: debt[i].id, to: cred[j].id, amount: a });
+      debt[i].a -= a; cred[j].a -= a;
+      if (debt[i].a === 0) i++; if (cred[j].a === 0) j++;
+    }
+    return out;
+  }
+
+  function renderExpenses() {
+    const ms = members();
+    $("onboard").hidden = ms.length > 0;
+    $("balCard").hidden = $("formCard").hidden = ms.length === 0;
+    const meId = me(); $("meTag").textContent = meId ? "שלום " + mName(meId) : "";
+    renderBalances(); renderFormChips(); renderHistory(); renderMembers(); renderManual();
+  }
+
+  function renderBalances() {
+    const b = balances();
+    $("balances").innerHTML = members().map(m => {
+      const v = b[m.id] || { net:0, paid:0 };
+      const cls = v.net > 0 ? "pos" : v.net < 0 ? "neg" : "";
+      const lbl = v.net > 0 ? "מגיע לו" : v.net < 0 ? "חייב" : "מאוזן";
+      return `<div class="bal"><div class="n"><span class="dot" style="background:${safeColor(m.color)}"></span>${esc(m.name)}</div>
+        <div class="v ${cls}"><span class="amt">${v.net > 0 ? "+" : ""}${money(v.net)}</span></div>
+        <div class="s">${lbl} · שילם ${money(v.paid)}</div></div>`;
+    }).join("");
+    const d = simplify(b);
+    $("debts").innerHTML = d.length ? d.map((x,i) => {
+      const msg = `היי ${mName(x.from)} 🙂 לפי "המכולת שלנו" נשאר לך להעביר ל${mName(x.to)} ${money(x.amount)}`;
+      return `<li><div><b>${esc(mName(x.from))}</b> מעביר ל<b>${esc(mName(x.to))}</b> <span class="amt">${money(x.amount)}</span></div>
+        <div class="debt-actions">
+          <a class="btn small wa" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">תזכורת בוואטסאפ</a>
+          <button class="btn small" data-settle="${i}">שולם ✓</button>
+        </div></li>`;
+    }).join("") : `<li class="empty" style="display:block">כולם מאוזנים 🎉</li>`;
+    $("debts").querySelectorAll("[data-settle]").forEach(btn => btn.onclick = () => {
+      const x = d[+btn.dataset.settle];
+      btn.disabled = true; haptic(10);
+      const ref = doc(collection(db, "settlements"));
+      write(setDoc(ref, { from:x.from, to:x.to, amount:x.amount, date:today(), createdAt:Date.now() }));
+      toast(`${mName(x.from)} → ${mName(x.to)} ${money(x.amount)} נרשם ✓`, "ביטול", () => write(deleteDoc(ref)));
+    });
+  }
+
+  function renderManual() {
+    const ms = members();
+    const opts = sel => ms.map(m => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
+    const f = $("mFrom").value || me() || (ms[0] && ms[0].id), t = $("mTo").value || (ms.find(m => m.id !== f) || {}).id;
+    $("mFrom").innerHTML = opts(f); $("mTo").innerHTML = opts(t);
+    $("manualBox").hidden = ms.length < 2;
+  }
+  $("manualForm").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const from = $("mFrom").value, to = $("mTo").value, amount = calc($("mAmt").value);
+    if (from === to) return toast("צריך שני שותפים שונים");
+    if (!(amount > 0)) return toast("סכום לא תקין");
+    if (amount > MAX_AMOUNT) return toast("סכום גדול מדי");
+    write(addDoc(collection(db, "settlements"), { from, to, amount, date: today(), createdAt: Date.now() }));
+    $("mAmt").value = ""; toast("ההעברה נרשמה ✓");
+  });
+
+  function renderFormChips() {
+    const ms = members();
+    if (selPayer && !ms.some(m => m.id === selPayer)) selPayer = null;
+    if (!selPayer) selPayer = me() || (ms[0] && ms[0].id) || null;
+    if (!selSplit || (selSplit.size === 0 && !splitTouched)) selSplit = new Set(ms.map(m => m.id));
+    [...selSplit].forEach(id => { if (!ms.some(m => m.id === id)) selSplit.delete(id); });
+
+    $("catChips").innerHTML = ECATS.map(c => `<span class="chip ${c.k === selCat ? "on" : ""}" data-ec="${c.k}">${c.e} ${c.n}</span>`).join("");
+    $("catChips").querySelectorAll("[data-ec]").forEach(c => c.onclick = () => { selCat = c.dataset.ec; renderFormChips(); });
+
+    $("payerChips").innerHTML = ms.map(m => `<span class="chip ${m.id === selPayer ? "on" : ""}" data-p="${esc(m.id)}">${esc(m.name)}</span>`).join("");
+    $("payerChips").querySelectorAll("[data-p]").forEach(c => c.onclick = () => { selPayer = c.dataset.p; renderFormChips(); });
+
+    const key = ms.map(m => m.id).join(",");
+    if (!customSplit) {
+      $("splitChips").hidden = false; $("splitCustom").hidden = true;
+      $("splitChips").innerHTML = ms.map(m => `<span class="chip ${selSplit.has(m.id) ? "on" : ""}" data-s="${esc(m.id)}">${esc(m.name)}</span>`).join("");
+      $("splitChips").querySelectorAll("[data-s]").forEach(c => c.onclick = () => {
+        splitTouched = true; const id = c.dataset.s; selSplit.has(id) ? selSplit.delete(id) : selSplit.add(id); renderFormChips();
+      });
+    } else {
+      $("splitChips").hidden = true; $("splitCustom").hidden = false;
+      if ($("splitCustom").dataset.built !== key) {
+        $("splitCustom").innerHTML = ms.map(m => `<label>${esc(m.name)}<input class="field" type="text" inputmode="decimal" data-c="${esc(m.id)}" placeholder="0"></label>`).join("");
+        $("splitCustom").dataset.built = key;
+        $("splitCustom").querySelectorAll("input").forEach(i => i.oninput = updateHint);
+      }
+    }
+    $("splitModeBtn").textContent = customSplit ? "חלוקה שווה" : "חלוקה לא שווה";
+    updateHint();
+  }
+  function customValues() { const o = {}; $("splitCustom").querySelectorAll("input").forEach(i => { const v = calc(i.value); if (v > 0) o[i.dataset.c] = v; }); return o; }
+  function updateHint() {
+    const raw = $("eAmt").value, amt = calc(raw);
+    $("calcHint").textContent = (/[+\-*/]/.test(raw.replace(/^-/, "")) && amt > 0) ? `= ${money(amt)}` : "";
+    if (!customSplit) {
+      const n = selSplit ? selSplit.size : 0;
+      $("splitHint").textContent = !n ? "בחרו לפחות שותף אחד" : amt > 0 ? `כל אחד: ${money(Math.round(amt / n))}` : "";
+    } else {
+      const diff = (amt || 0) - Object.values(customValues()).reduce((a,b) => a + b, 0);
+      $("splitHint").textContent = amt > 0 ? (diff === 0 ? "החלוקה מסתדרת ✓" : `נשאר לחלק: ${money(diff)}`) : "הזינו סכום לכל אחד";
+    }
+  }
+
+  function inPeriod(dateStr) { return monthFilter === "all" || (dateStr || "").startsWith(monthFilter); }
+
+  function renderHistory() {
+    // month selector
+    const monthsSet = new Set([today().slice(0,7)]);
+    state.expenses.forEach(e => e.date && monthsSet.add(e.date.slice(0,7)));
+    state.settlements.forEach(s => s.date && monthsSet.add(s.date.slice(0,7)));
+    const months = [...monthsSet].sort().reverse();
+    if (monthFilter !== "all" && !monthsSet.has(monthFilter)) monthFilter = months[0];
+    $("monthSel").innerHTML = months.map(m => `<option value="${esc(m)}" ${m === monthFilter ? "selected" : ""}>${monthLabel(m)}</option>`).join("")
+      + `<option value="all" ${monthFilter === "all" ? "selected" : ""}>כל הזמנים</option>`;
+
+    const ms = members();
+    if (histFilter !== "all" && !ms.some(m => m.id === histFilter)) histFilter = "all";
+    $("histFilter").innerHTML = ms.length > 1 ? [["all","כולם"], ...ms.map(m => [m.id, m.name])]
+      .map(([id,n]) => `<span class="chip ${histFilter === id ? "on" : ""}" data-hf="${esc(id)}">${esc(n)}</span>`).join("") : "";
+    $("histFilter").querySelectorAll("[data-hf]").forEach(c => c.onclick = () => { histFilter = c.dataset.hf; renderHistory(); });
+
+    // stats + summary for the period
+    const exps = state.expenses.filter(e => inPeriod(e.date));
+    const total = exps.reduce((a,e) => a + e.amount, 0);
+    const myShare = histFilter !== "all" ? exps.reduce((a,e) => a + (shares(e)[histFilter] || 0), 0) : null;
+    $("stats").innerHTML = exps.length
+      ? `<div>${monthFilter === "all" ? "סה״כ" : "סה״כ בחודש"}<b>${money(total)}</b></div><div>קניות<b>${exps.length}</b></div>`
+        + (ms.length ? `<div>ממוצע לשותף<b>${money(Math.round(total / ms.length))}</b></div>` : "")
+        + (myShare !== null ? `<div>החלק של ${esc(mName(histFilter))}<b>${money(myShare)}</b></div>` : "")
+      : "";
+
+    if (exps.length) {
+      const byCat = {}; exps.forEach(e => byCat[ecatOf(e)] = (byCat[ecatOf(e)] || 0) + e.amount);
+      const byPayer = {}; exps.forEach(e => byPayer[e.paidBy] = (byPayer[e.paidBy] || 0) + e.amount);
+      const bars = (entries, label, color) => {
+        const max = Math.max(...entries.map(x => x[1]), 1);
+        return entries.sort((a,b) => b[1] - a[1]).map(([k,v]) => `<div class="row"><span class="lbl">${label(k)}</span>
+          <div class="track"><div class="fill" style="width:${Math.max(3, v / max * 100)}%;background:${color(k)}"></div></div><span class="amt">${money(v)}</span></div>`).join("");
+      };
+      $("summary").innerHTML =
+        `<div class="bars"><div class="sub-title" style="margin-top:0">לפי סוג</div>${bars(Object.entries(byCat), k => `${ECAT[k].e} ${ECAT[k].n}`, () => "var(--olive)")}</div>
+         <div class="bars"><div class="sub-title" style="margin-top:0">מי שילם</div>${bars(Object.entries(byPayer), k => esc(mName(k)), k => mColor(k))}</div>`;
+    } else $("summary").innerHTML = "";
+
+    // list
+    const items = [
+      ...state.expenses.map(e => ({ k:"e", d:e.date || "", c:e.createdAt || 0, x:e })),
+      ...state.settlements.map(s => ({ k:"s", d:s.date || "", c:s.createdAt || 0, x:s }))
+    ].filter(it => inPeriod(it.d)).filter(it => histFilter === "all" ? true
+      : it.k === "e" ? (it.x.paidBy === histFilter || shares(it.x)[histFilter] > 0)
+      : (it.x.from === histFilter || it.x.to === histFilter))
+     .sort((a,b) => b.d.localeCompare(a.d) || b.c - a.c);
+
+    if (!items.length) { $("hist").innerHTML = `<li class="empty" style="display:block">אין רשומות בתקופה הזו</li>`; return; }
+    const dfmt = d => d ? new Date(d + "T00:00").toLocaleDateString("he-IL", { day:"numeric", month:"short" }) : "";
+    let lastMonth = null, html = "";
+    items.forEach(it => {
+      if (monthFilter === "all") { const m = it.d.slice(0,7); if (m !== lastMonth) { html += `<li class="month-h">${m ? monthLabel(m) : ""}</li>`; lastMonth = m; } }
+      if (it.k === "e") {
+        const e = it.x, s = shares(e), ids = Object.keys(s), c = ECAT[ecatOf(e)];
+        const all = !e.custom && ids.length === state.members.length;
+        const who = e.custom ? "לא שווה: " + ids.map(id => `${esc(mName(id))} ${money(s[id])}`).join(", ")
+                  : all ? "בין כולם" : "בין " + ids.map(id => esc(mName(id))).join(", ");
+        const mine = histFilter !== "all" && s[histFilter] ? ` · החלק של ${esc(mName(histFilter))}: ${money(s[histFilter])}` : "";
+        html += `<li><div class="ic" title="${c.n}">${c.e}</div><div class="body"><div class="t">${esc(e.title)}</div>
+          <div class="m"><span class="dot sm" style="background:${mColor(e.paidBy)}"></span> ${esc(mName(e.paidBy))} שילם · ${dfmt(e.date)} · ${who}${mine}</div></div>
+          <div class="right"><div class="amt">${money(e.amount)}</div>
+          <button class="btn link" data-edit="${esc(e.id)}">עריכה</button><button class="btn link danger" data-del="expenses:${esc(e.id)}">מחיקה</button></div></li>`;
+      } else {
+        const s = it.x;
+        html += `<li><div class="ic pay">💸</div><div class="body"><div class="t">החזר כסף</div>
+          <div class="m">${esc(mName(s.from))} העביר ל${esc(mName(s.to))} · ${dfmt(s.date)}</div></div>
+          <div class="right"><div class="amt">${money(s.amount)}</div><button class="btn link danger" data-del="settlements:${esc(s.id)}">מחיקה</button></div></li>`;
+      }
+    });
+    $("hist").innerHTML = html;
+    $("hist").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+      const k = b.dataset.del.indexOf(":"), c = b.dataset.del.slice(0, k), id = b.dataset.del.slice(k + 1);
+      const rec = state[c].find(x => x.id === id); if (!rec) return;
+      const { id: _, ...data } = rec;
+      write(deleteDoc(doc(db, c, id)));
+      toast("נמחק", "ביטול", () => write(setDoc(doc(db, c, id), data)));
+    });
+    $("hist").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => startEdit(b.dataset.edit));
+  }
+  $("monthSel").onchange = () => { monthFilter = $("monthSel").value; renderHistory(); };
+
+  function startEdit(id) {
+    const e = state.expenses.find(x => x.id === id); if (!e) return;
+    editingId = id; fromBought = null;
+    $("eTitle").value = e.title; $("eAmt").value = String(e.amount / 100); $("eDate").value = e.date || today();
+    selPayer = e.paidBy; selCat = ecatOf(e);
+    if (e.custom) {
+      customSplit = true; $("splitCustom").dataset.built = ""; renderFormChips();
+      $("splitCustom").querySelectorAll("input").forEach(i => { const v = e.custom[i.dataset.c]; i.value = v ? String(v / 100) : ""; });
+    } else { customSplit = false; selSplit = new Set(e.splitAmong || []); splitTouched = true; }
+    $("formTitle").textContent = "עריכת קנייה"; $("saveBtn").textContent = "עדכון"; $("cancelEditBtn").hidden = false;
+    renderFormChips(); setTab("exp"); $("formCard").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+  function resetForm() {
+    editingId = null; fromBought = null; $("expForm").reset(); $("eAmt").classList.remove("invalid"); $("eDate").value = today(); $("calcHint").textContent = "";
+    customSplit = false; splitTouched = false; selSplit = new Set(members().map(m => m.id)); selPayer = me() || selPayer; selCat = "super";
+    $("splitCustom").dataset.built = ""; $("formTitle").textContent = "רישום קנייה"; $("saveBtn").textContent = "שמירה"; $("cancelEditBtn").hidden = true;
+    renderFormChips();
+  }
+
+  function renderMembers() {
+    const used = new Set();
+    state.expenses.forEach(e => { used.add(e.paidBy); Object.keys(shares(e)).forEach(id => used.add(id)); });
+    state.settlements.forEach(s => { used.add(s.from); used.add(s.to); });
+    const ms = members();
+    $("memList").innerHTML = ms.length ? ms.map(m => `<div class="mem"><span class="dot" style="background:${safeColor(m.color)}"></span><span style="flex:1">${esc(m.name)}</span>
+      ${used.has(m.id) ? '<span class="hint">יש לו רשומות</span>' : `<button class="btn link danger" data-rm="${esc(m.id)}">הסרה</button>`}</div>`).join("")
+      : `<div class="empty">עוד אין שותפים</div>`;
+    $("memList").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => write(deleteDoc(doc(db, "members", b.dataset.rm))));
+    const cur = me();
+    $("meSel").innerHTML = `<option value="">— לא נבחר —</option>` + ms.map(m => `<option value="${esc(m.id)}" ${m.id === cur ? "selected" : ""}>${esc(m.name)}</option>`).join("");
+  }
+
+  $("eDate").value = today();
+  $("eAmt").addEventListener("input", updateHint);
+  const liveValidate = el => el.addEventListener("input", () => {
+    const v = el.value.trim(), a = calc(v);
+    el.classList.toggle("invalid", v !== "" && !(a > 0 && a <= MAX_AMOUNT));
+  });
+  liveValidate($("eAmt")); liveValidate($("mAmt"));
+  $("splitModeBtn").onclick = () => { customSplit = !customSplit; $("splitCustom").dataset.built = ""; renderFormChips(); };
+  $("cancelEditBtn").onclick = resetForm;
+
+  $("expForm").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const title = $("eTitle").value.trim(), amount = calc($("eAmt").value);
+    if (!title) return toast("חסר מה נקנה");
+    if (!(amount > 0)) return toast("סכום לא תקין");
+    if (amount > MAX_AMOUNT) return toast("סכום גדול מדי (עד 100,000 ₪)");
+    if (!selPayer) return toast("בחרו מי שילם");
+    const data = { title, amount, paidBy: selPayer, date: $("eDate").value || today(), category: selCat };
+    if (customSplit) {
+      const c = customValues();
+      if (Object.values(c).reduce((a,b) => a + b, 0) !== amount) return toast("סכומי החלוקה לא שווים לסכום הקנייה");
+      data.custom = c; data.splitAmong = Object.keys(c);
+    } else {
+      if (!selSplit.size) return toast("בחרו בין מי מתחלק");
+      data.splitAmong = [...selSplit]; data.custom = null;
+    }
+    const prev = editingId ? state.expenses.find(x => x.id === editingId) : null;
+    data.createdAt = prev ? (prev.createdAt || Date.now()) : Date.now();
+    // One atomic batch: the expense + removing the bought items it came from.
+    // Not awaited: it is applied locally at once and syncs when there is reception.
+    const batch = writeBatch(db);
+    batch.set(editingId ? doc(db, "expenses", editingId) : doc(collection(db, "expenses")), data);
+    (fromBought || []).forEach(id => batch.delete(doc(db, "groceries", id)));
+    write(batch.commit());
+    const wasEdit = !!editingId;
+    monthFilter = data.date.slice(0,7);
+    resetForm();
+    haptic(10);
+    toast(wasEdit ? "עודכן ✓" : "נשמר ✓");
+  });
+
+  // CSV export (opens nicely in Excel, Hebrew included)
+  $("exportBtn").onclick = () => {
+    const rows = [["תאריך","סוג","מה נקנה","סכום","מי שילם","מתחלק בין", ...members().map(m => "חלק של " + m.name)]];
+    [...state.expenses].sort((a,b) => (a.date||"").localeCompare(b.date||"")).filter(e => inPeriod(e.date)).forEach(e => {
+      const s = shares(e);
+      rows.push([e.date, ECAT[ecatOf(e)].n, e.title, (e.amount/100).toFixed(2), mName(e.paidBy), Object.keys(s).map(mName).join(" + "), ...members().map(m => s[m.id] ? (s[m.id]/100).toFixed(2) : "")]);
+    });
+    state.settlements.filter(s => inPeriod(s.date)).forEach(s => rows.push([s.date, "החזר", `${mName(s.from)} ← ${mName(s.to)}`, (s.amount/100).toFixed(2), mName(s.from), mName(s.to)]));
+    // Prefix cells that Excel would treat as formulas (=, +, -, @) — plain numbers stay as they are
+    const cell = v => { let t = String(v ?? ""); if (/^[=+\-@\t\r]/.test(t) && !/^-?\d+(\.\d+)?$/.test(t)) t = "'" + t; return `"${t.replace(/"/g,'""')}"`; };
+    const csv = "\uFEFF" + rows.map(r => r.map(cell).join(",")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = `הוצאות-${monthFilter === "all" ? "הכל" : monthFilter}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  // Members modal
+  const sheet = { p: 0, anim: null, open: false, origin: null };
+  const setSheetP = p => { sheet.p = p; $("memOverlay").style.setProperty("--p", Math.max(0, Math.min(1.08, p)).toFixed(4)); };
+  const isPhoneSheet = () => matchMedia("(max-width:600px)").matches;
+  function animateSheet(to, velocity = 0, damping = 1) {
+    if (sheet.anim) sheet.anim.stop();
+    $("memOverlay").classList.add("open");
+    sheet.anim = spring({ from: sheet.p, to, velocity, response: 0.38, damping, onUpdate: setSheetP,
+      onDone: () => { if (to === 0) { $("memOverlay").classList.remove("open"); if (sheet.origin) sheet.origin.focus(); } } });
+  }
+  function openMembers(e) {
+    sheet.open = true; sheet.origin = e && e.currentTarget || $("membersBtn");
+    // desktop: grow out of the button that opened it
+    $("memOverlay").classList.add("open");
+    if (!isPhoneSheet()) {
+      const r = sheet.origin.getBoundingClientRect(), m = $("memSheet").getBoundingClientRect();
+      $("memSheet").style.transformOrigin = `${r.left + r.width / 2 - m.left}px ${r.top + r.height / 2 - m.top}px`;
+    } else $("memSheet").style.transformOrigin = "";
+    animateSheet(1);
+    if (!isPhoneSheet()) setTimeout(() => $("memInput").focus(), 120);
+  }
+  function closeMembers(velocity = 0) { sheet.open = false; animateSheet(0, velocity); }
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && sheet.open) closeMembers(); });
+
+  // drag the sheet header down to dismiss (phones)
+  (() => {
+    let d = null;
+    $("sheetHead").addEventListener("pointerdown", e => {
+      if (!isPhoneSheet() || e.target.closest("button")) return;
+      if (sheet.anim) sheet.anim.stop();
+      const h = $("memSheet").offsetHeight;
+      d = { id: e.pointerId, y0: e.clientY - (1 - sheet.p) * h, h, hist: [] };
+      $("sheetHead").setPointerCapture(e.pointerId);
+    });
+    $("sheetHead").addEventListener("pointermove", e => {
+      if (!d || e.pointerId !== d.id) return;
+      let y = e.clientY - d.y0;
+      if (y < 0) y = -rubberband(-y, d.h);                    // pulling up resists instead of hard-stopping
+      setSheetP(1 - y / d.h);
+      d.hist.push({ y: e.clientY, t: e.timeStamp }); if (d.hist.length > 12) d.hist.shift();
+    });
+    const up = e => {
+      if (!d || e.pointerId !== d.id) return;
+      const v = velocityOf(d.hist, "y"), y = (1 - sheet.p) * d.h;
+      const landing = y + project(v);
+      const h = d.h; d = null;
+      if (landing > h * 0.35) closeMembers(-v / h); else { sheet.open = true; animateSheet(1, -v / h); }
+    };
+    $("sheetHead").addEventListener("pointerup", up);
+    $("sheetHead").addEventListener("pointercancel", up);
+  })();
+  $("membersBtn").onclick = openMembers; $("onboardBtn").onclick = openMembers;
+  $("memClose").onclick = () => closeMembers();
+  $("memOverlay").addEventListener("click", e => { if (e.target === $("memOverlay")) closeMembers(); });
+  $("memForm").addEventListener("submit", ev => {
+    ev.preventDefault();
+    const name = $("memInput").value.trim(); if (!name) return;
+    if (state.members.some(m => m.name.trim().toLowerCase() === name.toLowerCase())) return toast("השם כבר קיים");
+    const used = new Set(state.members.map(m => m.color));
+    const color = COLORS.find(c => !used.has(c)) || COLORS[state.members.length % COLORS.length];
+    $("memInput").value = "";
+    const ref = doc(collection(db, "members"));
+    if (selSplit) selSplit.add(ref.id);
+    write(setDoc(ref, { name: name.slice(0, 30), color, createdAt: Date.now() }));
+  });
+  $("meSel").onchange = () => { store.set("makolet_me", $("meSel").value); selPayer = $("meSel").value || selPayer; renderExpenses(); renderList(currentItems); };
+
+  /* ═══════════════════════════════════════════════════════════
+     GROCERY LIST (same "groceries" collection as before)
+     ═══════════════════════════════════════════════════════════ */
+  const itemInput = $("itemInput"), suggestionsEl = $("suggestions"), dupWarning = $("dupWarning");
+
+  $("qtyPlus").addEventListener("click", () => { currentQty = Math.min(currentQty + 1, 99); $("qtyDisplay").textContent = currentQty; });
+  $("qtyMinus").addEventListener("click", () => { currentQty = Math.max(currentQty - 1, 1); $("qtyDisplay").textContent = currentQty; });
+  $("groupToggle").onclick = () => { grouped = !grouped; store.set("makolet_grouped", grouped ? "1" : "0"); renderList(currentItems); };
+
+  onSnapshot(query(groceriesCol, orderBy("createdAt", "asc")), snapshot => {
+    currentItems = snapshot.docs.map(d => ({ ...d.data(), id: d.id })).filter(VALID.groceries)
+      .map(i => ({ ...i, name: String(i.name).slice(0, 80), qty: Math.min(Math.max(parseInt(i.qty) || 1, 1), 99), bought: i.bought === true }));
+    renderList(currentItems);
+    knownIds.clear(); currentItems.forEach(i => knownIds.add(i.id));
+    currentItems.forEach(i => sessionNames.add(i.name));
+    checkDuplicate(itemInput.value.trim());
+    setStatus("ok");
+  }, onErr);
+
+  function renderList(items) {
+    if (swipe.active) { swipe.pending = true; return; }
+    const pending = items.filter(i => !i.bought), bought = items.filter(i => i.bought);
+    $("groupToggle").textContent = grouped ? "לפי סדר הוספה" : "לפי מחלקות";
+    if (!pending.length) {
+      $("pendingList").innerHTML = `<li class="empty"><span>הרשימה ריקה<br>מה צריך לקנות? 🛒</span></li>`;
+    } else if (grouped) {
+      const groups = {}; pending.forEach(i => (groups[catOf(i)] ||= []).push(i));
+      $("pendingList").innerHTML = [...CATS, OTHER].filter(c => groups[c.k]).map(c =>
+        `<li class="cat-h">${c.e} ${c.n} <span class="c">· ${groups[c.k].length}</span></li>` + groups[c.k].map(i => itemHTML(i, !knownIds.has(i.id))).join("")
+      ).join("");
+    } else {
+      $("pendingList").innerHTML = pending.map(i => itemHTML(i, !knownIds.has(i.id))).join("");
+    }
+    $("boughtList").innerHTML = bought.map(i => itemHTML(i, false)).join("");
+    setBadge($("pendingBadge"), pending.length); setBadge($("boughtBadge"), bought.length);
+    $("boughtSection").classList.toggle("visible", bought.length > 0);
+    $("tabBadge").textContent = pending.length ? `(${pending.length})` : "";
+    const total = items.length;
+    $("progress").classList.toggle("show", bought.length > 0 && total > 0);
+    $("progress").firstElementChild.style.width = total ? (bought.length / total * 100) + "%" : "0";
+    renderQuick();
+  }
+  function itemHTML(item, isNew) {
+    const anim = isNew ? `style="animation: slideIn 0.25s ease both"` : "";
+    const qtyTag = item.bought
+      ? (item.qty > 1 ? `<span class="item-qty">×${item.qty}</span>` : "")
+      : `<span class="item-qty${item.qty > 1 ? "" : " one"}" title="לחיצה מגדילה כמות" aria-label="כמות ${item.qty}, לחיצה מגדילה">${item.qty > 1 ? "×" + item.qty : "+"}</span>`;
+    const who = item.addedBy && state.members.some(m => m.id === item.addedBy)
+      ? `<span class="dot sm who" style="background:${mColor(item.addedBy)}" title="הוסיף/ה: ${esc(mName(item.addedBy))}"></span>` : "";
+    return `<li class="item${item.bought ? " bought" : ""}${justToggled.has(item.id) ? " pop" : ""}" data-id="${esc(item.id)}" data-bought="${!!item.bought}" ${anim}>
+        <div class="swipe-bg" aria-hidden="true"><span class="sb-del">🗑 מחיקה</span><span class="sb-check">${item.bought ? "↩ להחזיר לרשימה" : "✓ נקנה"}</span></div>
+        <div class="row">
+        <button class="toggle-btn" aria-label="${item.bought ? "בטל סימון" : "סמן כנקנה"}">
+          <svg class="checkmark" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 6.5L5 10L11.5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="name-wrap"><span class="name">${esc(item.name)}</span>${qtyTag}${who}</div>
+        <button class="delete-btn" aria-label="מחק ${esc(item.name)}">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 1.5L11.5 11.5M11.5 1.5L1.5 11.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </button></div></li>`;
+  }
+  function setBadge(el, n) { el.textContent = n; el.classList.toggle("show", n > 0); }
+
+  function renderQuick() {
+    const pendingNames = new Set(currentItems.filter(i => !i.bought).map(i => String(i.name).toLowerCase()));
+    const top = Object.entries(freq).filter(([n,c]) => c >= 2 && !pendingNames.has(n.toLowerCase())).sort((a,b) => b[1] - a[1]).slice(0, 10).map(x => x[0]);
+    $("quick").classList.toggle("show", top.length > 0);
+    $("quickChips").innerHTML = top.map(n => `<span class="chip" data-q="${esc(n)}">${esc(n)}</span>`).join("");
+    $("quickChips").querySelectorAll("[data-q]").forEach(c => c.onclick = () => addNames([c.dataset.q], 1));
+  }
+
+  function checkDuplicate(val) {
+    if (!val || /[,،\n]/.test(val)) { dupWarning.classList.remove("show"); itemInput.classList.remove("duplicate"); return false; }
+    const exists = currentItems.some(i => !i.bought && String(i.name).toLowerCase() === val.toLowerCase());
+    dupWarning.classList.toggle("show", exists); itemInput.classList.toggle("duplicate", exists);
+    return exists;
+  }
+
+  function addNames(names, qty) {
+    const pendingNames = new Set(currentItems.filter(i => !i.bought).map(i => i.name.toLowerCase()));
+    const seen = new Set(); let added = 0, skipped = 0;
+    const batch = writeBatch(db);
+    for (const raw of names) {
+      const name = raw.slice(0, 80), key = name.toLowerCase();
+      if (names.length > 1 && (pendingNames.has(key) || seen.has(key))) { skipped++; continue; } // skip duplicates on multi-add
+      seen.add(key);
+      batch.set(doc(groceriesCol), { name, qty, bought: false, cat: categorize(name), addedBy: me() || null, createdAt: serverTimestamp() });
+      bumpFreq(name); added++;
+    }
+    if (added) write(batch.commit()); // one atomic write, applied locally at once (works offline)
+    if (names.length > 1) toast(skipped ? `נוספו ${added} פריטים (${skipped} כבר ברשימה)` : `נוספו ${added} פריטים`);
+  }
+  // Restoring a deleted item: a still-pending server timestamp comes back as null
+  const restorable = data => ({ ...data, createdAt: data.createdAt ?? serverTimestamp() });
+
+  function addItem() {
+    const raw = itemInput.value.trim();
+    if (!raw) { itemInput.classList.remove("shake"); void itemInput.offsetWidth; itemInput.classList.add("shake"); itemInput.focus(); return; }
+    const names = raw.split(/[,،\n]+/).map(s => s.trim()).filter(Boolean);
+    const qty = names.length > 1 ? 1 : currentQty;
+    itemInput.value = ""; currentQty = 1; $("qtyDisplay").textContent = "1";
+    dupWarning.classList.remove("show"); itemInput.classList.remove("duplicate"); itemInput.focus();
+    addNames(names, qty);
+  }
+  $("addBtn").addEventListener("click", () => { closeSuggestions(); addItem(); });
+  itemInput.addEventListener("animationend", () => itemInput.classList.remove("shake"));
+  itemInput.addEventListener("paste", () => setTimeout(() => { itemInput.value = itemInput.value.replace(/\r?\n/g, ", "); }, 0));
+
+  function clearItems(filterFn, listEl, label) {
+    const items = currentItems.filter(filterFn); if (!items.length) return;
+    listEl.querySelectorAll(".item").forEach(li => li.classList.add("removing"));
+    const batch = writeBatch(db); items.forEach(i => batch.delete(doc(db, "groceries", i.id)));
+    write(batch.commit());
+    toast(`נמחקו ${items.length} פריטים`, "ביטול", () => {
+      const b = writeBatch(db); items.forEach(({ id, ...data }) => b.set(doc(db, "groceries", id), restorable(data))); write(b.commit());
+    });
+  }
+  $("clearBoughtBtn").addEventListener("click", () => clearItems(i => i.bought, $("boughtList"), "הפריטים שנקנו"));
+  $("clearPendingBtn").addEventListener("click", () => clearItems(i => !i.bought, $("pendingList"), "הפריטים ברשימה"));
+
+  // Bought items → expense
+  $("toExpenseBtn").addEventListener("click", () => {
+    const bought = currentItems.filter(i => i.bought);
+    if (!bought.length) return;
+    if (!state.members.length) { openMembers(); return toast("קודם מוסיפים שותפים"); }
+    resetForm();
+    fromBought = bought.map(i => i.id);
+    $("eTitle").value = bought.map(i => (i.qty > 1 ? `${i.name} ×${i.qty}` : i.name)).join(", ").slice(0, 140);
+    const cats = new Set(bought.map(catOf));
+    selCat = [...cats].every(c => c === "clean" || c === "toilet") ? "home" : "super";
+    renderFormChips();
+    setTab("exp");
+    $("formCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => $("eAmt").focus(), 300);
+    toast("הזינו סכום — אחרי השמירה הפריטים יורדו מהרשימה");
+  });
+
+  // Autocomplete over the catalog + this list's history
+  let activeIdx = -1;
+  const lastSegment = () => { const v = itemInput.value; const k = Math.max(v.lastIndexOf(","), v.lastIndexOf("،")); return { pre: k >= 0 ? v.slice(0, k + 1) + " " : "", seg: v.slice(k + 1).trim() }; };
+  itemInput.addEventListener("input", () => { showSuggestions(); checkDuplicate(itemInput.value.trim()); });
+  itemInput.addEventListener("keydown", e => {
+    const items = suggestionsEl.querySelectorAll(".suggestion-item");
+    const isOpen = suggestionsEl.classList.contains("open");
+    if (e.key === "ArrowDown") { if (!isOpen) { showSuggestions(); return; } e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); applyActive(items); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, -1); applyActive(items); }
+    else if (e.key === "Enter") { if (isOpen && activeIdx >= 0) { e.preventDefault(); selectSuggestion(items[activeIdx].dataset.name); } else { closeSuggestions(); addItem(); } }
+    else if (e.key === "Escape") closeSuggestions();
+  });
+  suggestionsEl.addEventListener("mousedown", e => { const row = e.target.closest(".suggestion-item"); if (row) { e.preventDefault(); selectSuggestion(row.dataset.name); } });
+  document.addEventListener("click", e => { if (!e.target.closest(".input-wrap") && !e.target.closest("#suggestions")) closeSuggestions(); });
+
+  function showSuggestions() {
+    const { seg } = lastSegment(); if (!seg) return closeSuggestions();
+    const low = seg.toLowerCase();
+    const score = n => { const s = n.toLowerCase(); return (s.startsWith(low) ? 0 : 1) * 1000 - (freq[n] || 0) * 10 + s.length; };
+    const pool = new Set([...Object.keys(freq), ...sessionNames, ...CATALOG]);
+    const matches = [...pool].filter(n => n && n !== seg && String(n).toLowerCase().includes(low)).sort((a,b) => score(a) - score(b)).slice(0, 8);
+    if (!matches.length) return closeSuggestions();
+    suggestionsEl.innerHTML = matches.map(n => `<div class="suggestion-item" role="option" data-name="${esc(n)}"><span class="e">${CAT_BY_KEY[categorize(n)].e}</span><span>${highlight(n, seg)}</span></div>`).join("");
+    const card = suggestionsEl.offsetParent || suggestionsEl.parentElement;
+    const r = itemInput.getBoundingClientRect(), c = card.getBoundingClientRect();
+    suggestionsEl.style.top = (r.bottom - c.top + 6) + "px";
+    suggestionsEl.style.left = (r.left - c.left) + "px";
+    suggestionsEl.style.width = r.width + "px";
+    activeIdx = -1; suggestionsEl.classList.add("open");
+  }
+  function closeSuggestions() { suggestionsEl.classList.remove("open"); activeIdx = -1; }
+  function selectSuggestion(n) { itemInput.value = lastSegment().pre + n; closeSuggestions(); checkDuplicate(itemInput.value.trim()); itemInput.focus(); }
+  function applyActive(items) { items.forEach((el,i) => el.classList.toggle("active", i === activeIdx)); }
+  function highlight(name, q) {
+    const i = String(name).toLowerCase().indexOf(q.toLowerCase());
+    if (i === -1) return esc(name);
+    return esc(name.slice(0,i)) + `<mark>${esc(name.slice(i, i + q.length))}</mark>` + esc(name.slice(i + q.length));
+  }
+
+  /* ───────────── Grocery rows: swipe right = bought, swipe left = delete ───────────── */
+  function toggleItem(item) {
+    justToggled.add(item.id); setTimeout(() => justToggled.delete(item.id), 600);
+    haptic();
+    write(updateDoc(doc(db, "groceries", item.id), { bought: !item.bought }));
+  }
+  function deleteItem(item, li) {
+    li.classList.add("removing");
+    const { id, ...data } = item;
+    setTimeout(() => {
+      write(deleteDoc(doc(db, "groceries", id)));
+      toast(`"${item.name}" נמחק`, "ביטול", () => write(setDoc(doc(db, "groceries", id), restorable(data))));
+    }, 260);
+  }
+
+  function setupSwipe(list) {
+    const setX = (s, x) => {
+      s.x = x; s.row._x = x;
+      s.row.style.transform = x ? `translate3d(${x}px,0,0)` : "";
+      if (x > 0.5) s.li.dataset.dir = "right"; else if (x < -0.5) s.li.dataset.dir = "left"; else delete s.li.dataset.dir;
+    };
+    list.addEventListener("pointerdown", e => {
+      const row = e.target.closest(".row");
+      if (!row || (e.pointerType === "mouse" && e.button !== 0)) return;
+      const li = row.parentElement, item = currentItems.find(i => i.id === li.dataset.id);
+      if (!item) return;
+      if (row._anim) row._anim.stop(); // interruptible: grab it mid-flight, from where it is on screen
+      const startX = row._x || 0;
+      swipe.cand = { li, row, item, id: e.pointerId, sx: e.clientX, sy: e.clientY, grab: e.clientX - startX, x: startX, w: li.offsetWidth, armed: false, hist: [] };
+    });
+    list.addEventListener("pointermove", e => {
+      const s = swipe.active || swipe.cand;
+      if (!s || e.pointerId !== s.id) return;
+      const dx = e.clientX - s.sx, dy = e.clientY - s.sy;
+      if (!swipe.active) {
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;           // hysteresis before committing to a direction
+        if (Math.abs(dy) >= Math.abs(dx)) { swipe.cand = null; return; } // vertical: let the page scroll
+        swipe.active = s; swipe.cand = null;
+        s.row.setPointerCapture(e.pointerId); s.li.classList.add("swiping"); closeSuggestions();
+      }
+      let x = e.clientX - s.grab;                                     // 1:1 with the finger, from where it grabbed
+      const lim = s.w * 0.75;
+      if (Math.abs(x) > lim) x = Math.sign(x) * (lim + rubberband(Math.abs(x) - lim, s.w));
+      setX(s, x);
+      s.hist.push({ x: e.clientX, t: e.timeStamp }); if (s.hist.length > 12) s.hist.shift();
+      const armed = Math.abs(x) > s.w * 0.33;
+      if (armed !== s.armed) { s.armed = armed; s.li.classList.toggle("armed", armed); if (armed) haptic(6); }
+    });
+    const end = e => {
+      const s = swipe.active;
+      if (swipe.cand && swipe.cand.id === e.pointerId) swipe.cand = null;
+      if (!s || e.pointerId !== s.id) return;
+      swipe.active = null; swipe.blockClick = true; setTimeout(() => swipe.blockClick = false, 60);
+      s.li.classList.remove("swiping");
+      const v = e.type === "pointercancel" ? 0 : velocityOf(s.hist, "x");
+      const landing = s.x + project(v);                               // decide by where the flick is going, not where it let go
+      const commit = e.type !== "pointercancel" && Math.abs(landing) > s.w * 0.4 && Math.sign(landing) === Math.sign(s.x);
+      if (!store.get("makolet_swiped") && commit) { store.set("makolet_swiped", "1"); $("swipeTip").hidden = true; }
+      const after = () => { s.li.classList.remove("armed"); if (swipe.pending) { swipe.pending = false; renderList(currentItems); } };
+      if (commit && landing < 0) {
+        haptic(12);
+        s.row._anim = spring({ from: s.x, to: -s.w * 1.05, velocity: Math.min(v, -600), response: 0.28, damping: 1,
+          onUpdate: x => setX(s, x), onDone: () => { deleteItem(s.item, s.li); after(); } });
+      } else {
+        // a flick carried momentum, so a little bounce is earned; a slow release settles without overshoot
+        s.row._anim = spring({ from: s.x, to: 0, velocity: v, response: 0.35, damping: Math.abs(v) > 300 ? 0.8 : 1,
+          onUpdate: x => setX(s, x), onDone: after });
+        if (commit) toggleItem(s.item);
+      }
+    };
+    list.addEventListener("pointerup", end);
+    list.addEventListener("pointercancel", end);
+    list.addEventListener("click", e => { if (swipe.blockClick) { e.stopPropagation(); e.preventDefault(); } }, true);
+  }
+  setupSwipe($("pendingList")); setupSwipe($("boughtList"));
+  if (!store.get("makolet_swiped") && matchMedia("(pointer: coarse)").matches) $("swipeTip").hidden = false;
+
+  function handleClick(e) {
+    const li = e.target.closest(".item"); if (!li) return;
+    const id = li.dataset.id, bought = li.dataset.bought === "true";
+    const item = currentItems.find(i => i.id === id);
+    if (e.target.closest(".toggle-btn") && item) toggleItem(item);
+    else if (e.target.closest(".item-qty") && !bought && item) write(updateDoc(doc(db, "groceries", id), { qty: Math.min(item.qty + 1, 99) }));
+    else if (e.target.closest(".delete-btn") && item) deleteItem(item, li);
+  }
+  $("pendingList").addEventListener("click", handleClick);
+  $("boughtList").addEventListener("click", handleClick);
+</script>
+</body>
+</html>
