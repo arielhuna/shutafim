@@ -24,6 +24,13 @@ A real-time shared grocery list **and expense splitter** for roommates. Vanilla 
 
 Access is behind a simple shared password (`PASSWORD` in `index.html`).
 
+**Install as an app**
+- Android (Chrome): tap the **📲 התקנה** button in the header, or browser menu → *Install app*
+- iPhone (Safari): Share → *Add to Home Screen* (the app shows these steps the first time)
+- Opens full-screen with its own icon, loads with no reception (`sw.js`), and long-pressing the icon offers shortcuts to the shopping list or a new expense
+
+When deploying a change to anything other than `index.html`, bump `VERSION` in `sw.js` so installed copies refresh their cache.
+
 ---
 
 ## Setup
