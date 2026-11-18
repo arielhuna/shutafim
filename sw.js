@@ -2,9 +2,10 @@
 // Lets the installed app open with no reception. The data itself is synced by Firestore's own offline cache;
 // this only keeps the app shell (page, icons, Firebase SDK, fonts) available.
 // Bump VERSION whenever a deploy should replace the cached files.
-const VERSION = "v1";
+const VERSION = "v2"; // v2: drops any page cached by v1 (which could have cached an error page)
 const SHELL = `shell-${VERSION}`;
 const RUNTIME = `runtime-${VERSION}`;
+const NAV_TIMEOUT = 3000; // ms
 const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];
 // Static third-party files that are safe to keep (versioned URLs / fonts)
 const CACHEABLE_HOSTS = ["www.gstatic.com", "fonts.googleapis.com", "fonts.gstatic.com"];
@@ -26,13 +27,22 @@ self.addEventListener("fetch", event => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
-  // The page: network first so updates show up right away; cached copy when offline
+  // The page: network first so updates show up right away — but never wait more than NAV_TIMEOUT on a weak
+  // signal (a stalled request doesn't fail, it just hangs); then open the saved copy.
+  // Only a real, successful page is ever saved, so an error page can't replace the app.
   if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req)
-        .then(res => { const copy = res.clone(); caches.open(SHELL).then(c => c.put("./index.html", copy)); return res; })
-        .catch(() => caches.match("./index.html"))
-    );
+    event.respondWith((async () => {
+      const network = fetch(req).then(res => {
+        if (res.ok && res.type === "basic") { const copy = res.clone(); caches.open(SHELL).then(c => c.put("./index.html", copy)); }
+        return res;
+      });
+      try {
+        return await Promise.race([network, new Promise((_, reject) => setTimeout(() => reject(new Error("slow")), NAV_TIMEOUT))]);
+      } catch (e) {
+        const cached = await caches.match("./index.html");
+        return cached || network;   // nothing saved yet: keep waiting for the network
+      }
+    })());
     return;
   }
 
@@ -53,7 +63,7 @@ async function staleWhileRevalidate(req, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(req);
   const network = fetch(req)
-    .then(res => { if (res && (res.ok || res.type === "opaque")) cache.put(req, res.clone()); return res; })
+    .then(res => { if (res && res.ok) cache.put(req, res.clone()); return res; })
     .catch(() => cached);
   return cached || network;
 }

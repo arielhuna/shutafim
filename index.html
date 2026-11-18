@@ -692,15 +692,14 @@
      (Firestore metadata.fromCache === false). navigator.onLine alone can say "online" on a dead network.
      Actions that depend on everyone seeing the same numbers are allowed only while synced. */
   const SYNC_COLS = ["members", "expenses", "settlements", "groceries"];
-  const sync = { fromCache: {}, pending: {}, online: navigator.onLine, shown: false, timer: null };
+  const sync = { fromCache: {}, online: navigator.onLine, shown: false, timer: null };
   const isSynced = () => sync.online && SYNC_COLS.every(n => sync.fromCache[n] === false);
   function trackMeta(name, snap) {
     sync.fromCache[name] = snap.metadata.fromCache;
-    sync.pending[name] = snap.metadata.hasPendingWrites;
     updateSync();
   }
   function updateSync() {
-    const synced = isSynced(), pending = Object.values(sync.pending).some(Boolean);
+    const synced = isSynced();
     document.body.classList.toggle("unsynced", !synced);
     clearTimeout(sync.timer);
     if (synced) { document.body.classList.remove("offline"); $("syncPill").textContent = ""; }
@@ -708,7 +707,6 @@
       document.body.classList.add("offline");
       $("syncPill").textContent = sync.online ? "מתחבר… שינויים נשמרים ויסונכרנו" : "אין חיבור · הרשימה עובדת, סגירת חשבון מחכה לחיבור";
     }, sync.online ? 4000 : 600);
-    if (synced && pending) $("syncPill").textContent = "";
   }
   window.addEventListener("online", () => { sync.online = true; updateSync(); });
   window.addEventListener("offline", () => { sync.online = false; updateSync(); });
@@ -728,6 +726,8 @@
   }
   // A grocery item's id comes from its name: the same item added twice (even offline, on two phones) is one document
   const itemId = name => "i_" + hashId(name.trim().toLowerCase());
+  // Firestore Timestamp | number | null → stable string
+  const tsKey = t => t && typeof t.toMillis === "function" ? String(t.toMillis()) : (typeof t === "number" ? String(t) : "0");
 
   let fadeTimer;
   function setStatus(s) {
@@ -795,7 +795,7 @@
   const freq = (() => { try { return JSON.parse(store.get("makolet_freq") || "{}"); } catch (e) { return {}; } })();
   const bumpFreq = name => { freq[name] = (freq[name] || 0) + 1; store.set("makolet_freq", JSON.stringify(freq)); };
 
-  let editingId = null, customSplit = false, fromBought = null, histFilter = "all", monthFilter = today().slice(0,7);
+  let editingId = null, customSplit = false, fromBought = null, fromBoughtKey = null, histFilter = "all", monthFilter = today().slice(0,7);
   let selPayer = null, selSplit = null, splitTouched = false, selCat = "super";
 
   ["members","expenses","settlements"].forEach(name => {
@@ -1032,7 +1032,7 @@
 
   function startEdit(id) {
     const e = state.expenses.find(x => x.id === id); if (!e) return;
-    editingId = id; fromBought = null;
+    editingId = id; fromBought = null; fromBoughtKey = null;
     $("eTitle").value = e.title; $("eAmt").value = String(e.amount / 100); $("eDate").value = e.date || today();
     selPayer = e.paidBy; selCat = ecatOf(e);
     if (e.custom) {
@@ -1043,7 +1043,7 @@
     renderFormChips(); setTab("exp"); $("formCard").scrollIntoView({ behavior:"smooth", block:"start" });
   }
   function resetForm() {
-    editingId = null; fromBought = null; $("expForm").reset(); $("eAmt").classList.remove("invalid"); $("eDate").value = today(); $("calcHint").textContent = "";
+    editingId = null; fromBought = null; fromBoughtKey = null; $("expForm").reset(); $("eAmt").classList.remove("invalid"); $("eDate").value = today(); $("calcHint").textContent = "";
     customSplit = false; splitTouched = false; selSplit = new Set(members().map(m => m.id)); selPayer = me() || selPayer; selCat = "super";
     $("splitCustom").dataset.built = ""; $("formTitle").textContent = "רישום קנייה"; $("saveBtn").textContent = "שמירה"; $("cancelEditBtn").hidden = true;
     renderFormChips();
@@ -1079,6 +1079,7 @@
     if (!(amount > 0)) return toast("סכום לא תקין");
     if (amount > MAX_AMOUNT) return toast("סכום גדול מדי (עד 100,000 ₪)");
     if (!selPayer) return toast("בחרו מי שילם");
+    if (editingId && !requireSync("שמירת עריכה")) return;
     const data = { title, amount, paidBy: selPayer, date: $("eDate").value || today(), category: selCat };
     if (customSplit) {
       const c = customValues();
@@ -1094,7 +1095,7 @@
     // Not awaited: it is applied locally at once and syncs when there is reception.
     const batch = writeBatch(db);
     // Converting the same bought items on two phones → same id → one expense, not two
-    const expId = editingId || (fromBought && fromBought.length ? "b_" + hashId([...fromBought].sort().join(",")) : null);
+    const expId = editingId || (fromBoughtKey ? "b_" + fromBoughtKey : null);
     batch.set(expId ? doc(db, "expenses", expId) : doc(collection(db, "expenses")), data);
     (fromBought || []).forEach(id => batch.delete(doc(db, "groceries", id)));
     write(batch.commit());
@@ -1280,7 +1281,11 @@
       if (existing) {
         if (names.length > 1) { skipped++; continue; }                 // pasted list: keep what's already there
         // single add of an item already on the list: raise its quantity atomically (two phones = +2, never a lost update)
-        batch.update(doc(groceriesCol, existing.id), { qty: existing.qty + qty > 99 ? 99 : increment(qty) });
+        batch.set(doc(groceriesCol, existing.id), {
+          name: existing.name, bought: false, cat: catOf(existing), addedBy: existing.addedBy || null,
+          createdAt: existing.createdAt ?? serverTimestamp(),
+          qty: existing.qty + qty > 99 ? 99 : increment(qty)
+        }, { merge: true });
         bumped = { name, qty: Math.min(existing.qty + qty, 99) };
       } else {
         // id from the name: the same item added on two phones (even offline) lands on ONE document
@@ -1315,7 +1320,10 @@
     const batch = writeBatch(db); items.forEach(i => batch.delete(doc(db, "groceries", i.id)));
     write(batch.commit());
     toast(`נמחקו ${items.length} פריטים`, "ביטול", () => {
-      const b = writeBatch(db); items.forEach(({ id, ...data }) => b.set(doc(db, "groceries", id), restorable(data))); write(b.commit());
+      const present = new Set(currentItems.map(i => i.id));
+      const b = writeBatch(db); let n = 0;
+      items.forEach(({ id, ...data }) => { if (!present.has(id)) { b.set(doc(db, "groceries", id), restorable(data)); n++; } });
+      if (n) write(b.commit());
     });
   }
   $("clearBoughtBtn").addEventListener("click", () => clearItems(i => i.bought, $("boughtList"), "הפריטים שנקנו"));
@@ -1329,6 +1337,9 @@
     if (!state.members.length) { openMembers(); return toast("קודם מוסיפים שותפים"); }
     resetForm();
     fromBought = bought.map(i => i.id);
+    // Identify THIS purchase: item ids + when each was added. Re-adding an item next week gives it a new
+    // createdAt, so next week's expense gets a new id — while two phones converting the same list still agree.
+    fromBoughtKey = hashId(bought.map(i => `${i.id}@${tsKey(i.createdAt)}`).sort().join(","));
     $("eTitle").value = bought.map(i => (i.qty > 1 ? `${i.name} ×${i.qty}` : i.name)).join(", ").slice(0, 140);
     const cats = new Set(bought.map(catOf));
     selCat = [...cats].every(c => c === "clean" || c === "toilet") ? "home" : "super";
@@ -1389,7 +1400,10 @@
     const { id, ...data } = item;
     setTimeout(() => {
       write(deleteDoc(doc(db, "groceries", id)));
-      toast(`"${item.name}" נמחק`, "ביטול", () => write(setDoc(doc(db, "groceries", id), restorable(data))));
+      toast(`"${item.name}" נמחק`, "ביטול", () => {
+        if (currentItems.some(i => i.id === id)) return toast(`"${item.name}" כבר נוסף מחדש`);
+        write(setDoc(doc(db, "groceries", id), restorable(data)));
+      });
     }, 260);
   }
 
