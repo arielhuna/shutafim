@@ -277,7 +277,17 @@
     #statusDot.ok { background:var(--olive); }
     .toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--toast); -webkit-backdrop-filter:blur(16px) saturate(160%); backdrop-filter:blur(16px) saturate(160%); color:#fff; padding:11px 16px; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.18); font-size:.88rem; font-weight:600; opacity:0; transition:opacity .22s ease, transform .38s var(--spring); pointer-events:none; z-index:60; bottom:calc(18px + env(safe-area-inset-bottom)); display:flex; gap:12px; align-items:center; max-width:calc(100% - 32px); }
     .toast.show { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
-    .toast button { color:#fff; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+    .toast { overflow:hidden; min-height:46px; padding:9px 9px 9px 16px; gap:10px; width:max-content; }
+    .toast:not(.undo) { padding:11px 16px; }
+    .toast .t-ic { font-size:1.05rem; line-height:1; flex:none; }
+    .toast .t-msg { flex:1; min-width:0; line-height:1.35; overflow-wrap:anywhere; }
+    .toast button { flex:none; color:#fff; font-weight:800; font-size:.86rem; background:rgba(255,255,255,.17); border-radius:10px; padding:8px 13px;
+                    white-space:nowrap; display:inline-flex; align-items:center; gap:5px; transition:transform .32s var(--spring), background .15s; }
+    .toast button:active { transform:scale(.93); transition-duration:60ms; }
+    .toast .t-bar { position:absolute; inset:auto 0 0 0; height:3px; background:rgba(255,255,255,.5); transform-origin:right; display:none; }
+    .toast.undo .t-bar { display:block; animation:drain var(--dur, 7000ms) linear forwards; }
+    .toast.paused .t-bar { animation-play-state:paused; }
+    @keyframes drain { from { transform:scaleX(1); } to { transform:scaleX(0); } }
 
 
     /* ── Press feedback: instant on pointer-down, springy on release ── */
@@ -318,6 +328,7 @@
     @keyframes hintIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
     @media (display-mode: standalone) { #installBtn, .install-hint { display:none !important; } }
     @media (hover: hover) {
+      .toast button:hover { background:rgba(255,255,255,.26); }
       .btn:hover { background:rgba(61,90,53,.16); }
       .btn.primary:hover { background:var(--olive-mid); }
       .btn.link:hover { color:var(--ink); }
@@ -515,7 +526,7 @@
   <div>לחצו על כפתור השיתוף <span class="share-ic" aria-hidden="true">⬆︎</span> בתחתית ספארי, ואז על <b>"הוסף למסך הבית"</b>.</div>
   <button class="btn small" id="iosHintClose" style="margin-top:10px">הבנתי</button>
 </div>
-<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastAct" hidden></button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span class="t-ic" id="toastIcon" hidden></span><span class="t-msg" id="toastMsg"></span><button id="toastAct" hidden></button><i class="t-bar" aria-hidden="true"></i></div>
 
 <!-- Password (same as before) -->
 <script>
@@ -637,15 +648,46 @@
   // Haptics only on meaningful moments (commit points, check-off) — and on the same frame as the visual
   const haptic = (ms = 8) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
 
-  let toastTimer;
-  function toast(msg, actLabel, actFn, ms = 2400) {
+  /* ───────────── Toasts & undo ─────────────
+     Important actions happen immediately and offer "ביטול" for 7 seconds (Agency: forgiveness instead of
+     "are you sure?"). The timer pauses while the toast is touched or hovered, and Ctrl/Cmd+Z works on desktop. */
+  const UNDO_MS = 7000;
+  let toastTimer = null, toastLeft = 0, toastStart = 0, lastUndo = null;
+  function hideToast() { clearTimeout(toastTimer); $("toast").classList.remove("show", "paused"); lastUndo = null; }
+  function armToast(ms) { clearTimeout(toastTimer); toastLeft = ms; toastStart = performance.now(); toastTimer = setTimeout(hideToast, ms); }
+  function toast(msg, actLabel, actFn, ms = 2400, icon = "") {
+    const t = $("toast"), b = $("toastAct");
     $("toastMsg").textContent = msg;
-    const b = $("toastAct");
-    if (actLabel) { b.hidden = false; b.textContent = actLabel; b.onclick = () => { $("toast").classList.remove("show"); actFn(); }; }
-    else b.hidden = true;
-    $("toast").classList.add("show");
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").classList.remove("show"), actLabel ? 5000 : ms);
+    $("toastIcon").textContent = icon; $("toastIcon").hidden = !icon;
+    t.classList.remove("undo", "paused"); void t.offsetWidth;          // restart the timer bar
+    if (actLabel) {
+      b.hidden = false; b.textContent = actLabel;
+      b.onclick = () => { const fn = actFn; hideToast(); fn(); };
+      t.classList.add("undo");
+    } else { b.hidden = true; lastUndo = null; }
+    const dur = actLabel ? UNDO_MS : ms;
+    t.style.setProperty("--dur", dur + "ms");
+    t.classList.add("show");
+    armToast(dur);
   }
+  // Show what just happened, with a way back
+  function undoable(msg, icon, undoFn) {
+    const run = () => { undoFn(); haptic(8); toast("בוטל — הכל חזר למקום", null, null, 2000, "↩︎"); };
+    toast(msg, "↩︎ ביטול", run, 0, icon);
+    lastUndo = run;
+  }
+  (() => {
+    const t = $("toast");
+    const pause = () => { if (!t.classList.contains("undo") || t.classList.contains("paused")) return;
+      clearTimeout(toastTimer); toastLeft -= performance.now() - toastStart; t.classList.add("paused"); };
+    const resume = () => { if (!t.classList.contains("paused")) return; t.classList.remove("paused"); armToast(Math.max(toastLeft, 1500)); };
+    t.addEventListener("pointerenter", pause); t.addEventListener("pointerleave", resume);
+    document.addEventListener("keydown", e => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z" && lastUndo && !e.target.closest("input, textarea, select")) {
+        e.preventDefault(); const fn = lastUndo; hideToast(); fn();
+      }
+    });
+  })();
 
   /* ───────────── tabs, status, offline ───────────── */
   document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
@@ -879,14 +921,17 @@
       btn.disabled = true; haptic(10);
       const ref = doc(db, "settlements", "p_" + hashId(`${stateKey}|${x.from}|${x.to}|${x.amount}`));
       write(setDoc(ref, { from:x.from, to:x.to, amount:x.amount, date:today(), createdAt:Date.now() }));
-      toast(`${mName(x.from)} → ${mName(x.to)} ${money(x.amount)} נרשם ✓`, "ביטול", () => write(deleteDoc(ref)));
+      undoable(`נרשם ש${mName(x.from)} העביר ל${mName(x.to)} ${money(x.amount)}`, "💸", () => write(deleteDoc(ref)));
     });
   }
 
   function renderManual() {
     const ms = members();
     const opts = sel => ms.map(m => `<option value="${esc(m.id)}" ${m.id === sel ? "selected" : ""}>${esc(m.name)}</option>`).join("");
-    const f = $("mFrom").value || me() || (ms[0] && ms[0].id), t = $("mTo").value || (ms.find(m => m.id !== f) || {}).id;
+    const has = id => ms.some(m => m.id === id);
+    const f = has($("mFrom").value) ? $("mFrom").value : (me() || (ms[0] && ms[0].id));
+    let t = $("mTo").value;
+    if (!has(t) || t === f) t = (ms.find(m => m.id !== f) || {}).id;   // never default to the same person on both sides
     $("mFrom").innerHTML = opts(f); $("mTo").innerHTML = opts(t);
     $("manualBox").hidden = ms.length < 2;
   }
@@ -897,8 +942,10 @@
     if (from === to) return toast("צריך שני שותפים שונים");
     if (!(amount > 0)) return toast("סכום לא תקין");
     if (amount > MAX_AMOUNT) return toast("סכום גדול מדי");
-    write(addDoc(collection(db, "settlements"), { from, to, amount, date: today(), createdAt: Date.now() }));
-    $("mAmt").value = ""; toast("ההעברה נרשמה ✓");
+    const ref = doc(collection(db, "settlements"));
+    write(setDoc(ref, { from, to, amount, date: today(), createdAt: Date.now() }));
+    $("mAmt").value = ""; $("mAmt").classList.remove("invalid");
+    undoable(`נרשם ש${mName(from)} העביר ל${mName(to)} ${money(amount)}`, "💸", () => write(deleteDoc(ref)));
   });
 
   function renderFormChips() {
@@ -1024,7 +1071,8 @@
       const rec = state[c].find(x => x.id === id); if (!rec) return;
       const { id: _, ...data } = rec;
       write(deleteDoc(doc(db, c, id)));
-      toast("נמחק", "ביטול", () => write(setDoc(doc(db, c, id), data)));
+      const what = c === "expenses" ? `ההוצאה "${rec.title}" (${money(rec.amount)}) נמחקה` : `ההחזר של ${mName(rec.from)} (${money(rec.amount)}) נמחק`;
+      undoable(what, "🗑", () => write(setDoc(doc(db, c, id), data)));
     });
     $("hist").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { if (requireSync("עריכה")) startEdit(b.dataset.edit); });
   }
@@ -1057,7 +1105,13 @@
     $("memList").innerHTML = ms.length ? ms.map(m => `<div class="mem"><span class="dot" style="background:${safeColor(m.color)}"></span><span style="flex:1">${esc(m.name)}</span>
       ${used.has(m.id) ? '<span class="hint">יש לו רשומות</span>' : `<button class="btn link danger needs-sync" data-rm="${esc(m.id)}">הסרה</button>`}</div>`).join("")
       : `<div class="empty">עוד אין שותפים</div>`;
-    $("memList").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { if (requireSync("הסרת שותף")) write(deleteDoc(doc(db, "members", b.dataset.rm))); });
+    $("memList").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => {
+      if (!requireSync("הסרת שותף")) return;
+      const m = state.members.find(x => x.id === b.dataset.rm); if (!m) return;
+      const { id, ...data } = m;
+      write(deleteDoc(doc(db, "members", id)));
+      undoable(`${m.name} הוסר/ה מהדירה`, "👤", () => write(setDoc(doc(db, "members", id), data)));
+    });
     const cur = me();
     $("meSel").innerHTML = `<option value="">— לא נבחר —</option>` + ms.map(m => `<option value="${esc(m.id)}" ${m.id === cur ? "selected" : ""}>${esc(m.name)}</option>`).join("");
   }
@@ -1096,14 +1150,27 @@
     const batch = writeBatch(db);
     // Converting the same bought items on two phones → same id → one expense, not two
     const expId = editingId || (fromBoughtKey ? "b_" + fromBoughtKey : null);
-    batch.set(expId ? doc(db, "expenses", expId) : doc(collection(db, "expenses")), data);
-    (fromBought || []).forEach(id => batch.delete(doc(db, "groceries", id)));
+    const ref = expId ? doc(db, "expenses", expId) : doc(collection(db, "expenses"));
+    batch.set(ref, data);
+    const consumed = (fromBought || []).map(id => currentItems.find(i => i.id === id)).filter(Boolean);
+    consumed.forEach(i => batch.delete(doc(db, "groceries", i.id)));
     write(batch.commit());
     const wasEdit = !!editingId;
     monthFilter = data.date.slice(0,7);
     resetForm();
     haptic(10);
-    toast(wasEdit ? "עודכן ✓" : "נשמר ✓");
+    if (wasEdit) {
+      const { id: _, ...before } = prev;
+      undoable(`"${title}" עודכנה`, "✏️", () => write(setDoc(ref, before)));
+    } else {
+      undoable(`"${title}" · ${money(amount)} נרשמה${consumed.length ? ` · ${consumed.length} פריטים ירדו מהרשימה` : ""}`, "🧾", () => {
+        const b = writeBatch(db);
+        b.delete(ref);
+        const present = new Set(currentItems.map(i => i.id));            // put the bought items back, unless re-added
+        consumed.forEach(({ id, ...d }) => { if (!present.has(id)) b.set(doc(db, "groceries", id), restorable(d)); });
+        write(b.commit());
+      });
+    }
   });
 
   // CSV export (opens nicely in Excel, Hebrew included)
@@ -1319,7 +1386,7 @@
     listEl.querySelectorAll(".item").forEach(li => li.classList.add("removing"));
     const batch = writeBatch(db); items.forEach(i => batch.delete(doc(db, "groceries", i.id)));
     write(batch.commit());
-    toast(`נמחקו ${items.length} פריטים`, "ביטול", () => {
+    undoable(`נמחקו ${items.length} פריטים מהרשימה`, "🗑", () => {
       const present = new Set(currentItems.map(i => i.id));
       const b = writeBatch(db); let n = 0;
       items.forEach(({ id, ...data }) => { if (!present.has(id)) { b.set(doc(db, "groceries", id), restorable(data)); n++; } });
@@ -1400,8 +1467,8 @@
     const { id, ...data } = item;
     setTimeout(() => {
       write(deleteDoc(doc(db, "groceries", id)));
-      toast(`"${item.name}" נמחק`, "ביטול", () => {
-        if (currentItems.some(i => i.id === id)) return toast(`"${item.name}" כבר נוסף מחדש`);
+      undoable(`"${item.name}" נמחק מהרשימה`, "🗑", () => {
+        if (currentItems.some(i => i.id === id)) return;                // someone re-added it meanwhile
         write(setDoc(doc(db, "groceries", id), restorable(data)));
       });
     }, 260);
