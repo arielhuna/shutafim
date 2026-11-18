@@ -63,7 +63,8 @@
     .header-actions { margin-top:12px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; align-items:center; }
     .me-tag { font-size:.8rem; color:var(--ink-muted); }
     .offline-pill { display:none; font-size:.75rem; font-weight:700; color:var(--warn-ink); background:var(--warn-bg); border-radius:999px; padding:3px 10px; }
-    body.offline .offline-pill { display:inline-block; }
+    body.offline .offline-pill:not(:empty) { display:inline-block; }
+    body.unsynced .needs-sync { opacity:.45; }
 
     /* Layout */
     .layout { display:grid; grid-template-columns:minmax(0,1fr) 410px; gap:22px; align-items:start; }
@@ -363,7 +364,7 @@
     <h1>המכולת שלנו</h1>
     <p>קניות, הוצאות ומי חייב למי</p>
     <div class="header-actions">
-      <span class="offline-pill">אין קליטה — נשמר ויסתנכרן אח״כ</span>
+      <span class="offline-pill" id="syncPill" role="status"></span>
       <span class="me-tag" id="meTag"></span>
       <button class="btn small" id="membersBtn">👥 השותפים</button>
       <button class="btn small primary" id="installBtn" hidden>📲 התקנה</button>
@@ -396,7 +397,7 @@
             <div><label class="f">מי העביר</label><select class="field" id="mFrom"></select></div>
             <div><label class="f">למי</label><select class="field" id="mTo"></select></div>
             <div><label class="f">סכום ₪</label><input class="field" id="mAmt" type="text" inputmode="decimal" placeholder="0"></div>
-            <button class="btn primary" type="submit">רישום</button>
+            <button class="btn primary needs-sync" type="submit">רישום</button>
           </form>
         </details>
       </section>
@@ -455,7 +456,7 @@
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.5V15.5M2.5 9H15.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
           </button>
         </div>
-        <div class="dup-warning" id="dupWarning">⚠️ פריט זה כבר ברשימה</div>
+        <div class="dup-warning" id="dupWarning">⚠️ כבר ברשימה — הוספה תגדיל את הכמות</div>
         <div class="quick" id="quick"><div class="lbl">קונים הרבה</div><div class="chips" id="quickChips"></div></div>
 
         <section class="section" style="margin-top:6px">
@@ -477,7 +478,7 @@
             <button class="clear-btn" id="clearBoughtBtn">נקה הכל</button>
           </div>
           <ul class="item-list" id="boughtList"></ul>
-          <button class="btn primary to-expense" id="toExpenseBtn">💸 רישום הנקנה כהוצאה</button>
+          <button class="btn primary to-expense needs-sync" id="toExpenseBtn">💸 רישום הנקנה כהוצאה</button>
         </section>
         <div id="suggestions" class="suggestions" role="listbox"></div>
       </div>
@@ -543,7 +544,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
     initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-    collection, addDoc, setDoc, updateDoc, deleteDoc,
+    collection, addDoc, setDoc, updateDoc, deleteDoc, increment,
     doc, onSnapshot, query, orderBy, serverTimestamp, writeBatch
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -686,8 +687,47 @@
   };
   $("iosHintClose").onclick = () => { $("iosHint").hidden = true; store.set("makolet_ioshint", "1"); };
 
-  const syncOnline = () => document.body.classList.toggle("offline", !navigator.onLine);
-  window.addEventListener("online", syncOnline); window.addEventListener("offline", syncOnline); syncOnline();
+  /* ───────────── Sync state ─────────────
+     "Synced" = the browser is online AND every live query has been confirmed by the server
+     (Firestore metadata.fromCache === false). navigator.onLine alone can say "online" on a dead network.
+     Actions that depend on everyone seeing the same numbers are allowed only while synced. */
+  const SYNC_COLS = ["members", "expenses", "settlements", "groceries"];
+  const sync = { fromCache: {}, pending: {}, online: navigator.onLine, shown: false, timer: null };
+  const isSynced = () => sync.online && SYNC_COLS.every(n => sync.fromCache[n] === false);
+  function trackMeta(name, snap) {
+    sync.fromCache[name] = snap.metadata.fromCache;
+    sync.pending[name] = snap.metadata.hasPendingWrites;
+    updateSync();
+  }
+  function updateSync() {
+    const synced = isSynced(), pending = Object.values(sync.pending).some(Boolean);
+    document.body.classList.toggle("unsynced", !synced);
+    clearTimeout(sync.timer);
+    if (synced) { document.body.classList.remove("offline"); $("syncPill").textContent = ""; }
+    else sync.timer = setTimeout(() => {             // avoid flashing the pill during the normal first load
+      document.body.classList.add("offline");
+      $("syncPill").textContent = sync.online ? "מתחבר… שינויים נשמרים ויסונכרנו" : "אין חיבור · הרשימה עובדת, סגירת חשבון מחכה לחיבור";
+    }, sync.online ? 4000 : 600);
+    if (synced && pending) $("syncPill").textContent = "";
+  }
+  window.addEventListener("online", () => { sync.online = true; updateSync(); });
+  window.addEventListener("offline", () => { sync.online = false; updateSync(); });
+  // Gate for actions that would create duplicates if two phones did them from different views
+  function requireSync(what) {
+    if (isSynced()) return true;
+    toast(`${what} צריך חיבור — כדי שכולם יראו את אותם מספרים ולא ייווצרו כפילויות`);
+    return false;
+  }
+  // Stable short hash → deterministic document ids, so the same action from two phones writes ONE document
+  function hashId(str) {
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (h2 >>> 0).toString(36) + (h1 >>> 0).toString(36);
+  }
+  // A grocery item's id comes from its name: the same item added twice (even offline, on two phones) is one document
+  const itemId = name => "i_" + hashId(name.trim().toLowerCase());
 
   let fadeTimer;
   function setStatus(s) {
@@ -759,7 +799,8 @@
   let selPayer = null, selSplit = null, splitTouched = false, selCat = "super";
 
   ["members","expenses","settlements"].forEach(name => {
-    onSnapshot(collection(db, name), snap => {
+    onSnapshot(collection(db, name), { includeMetadataChanges: true }, snap => {
+      trackMeta(name, snap);
       state[name] = snap.docs.map(d => ({ ...d.data(), id: d.id })).filter(VALID[name]);
       renderExpenses(); if (name === "members") renderList(currentItems);
       setStatus("ok");
@@ -827,13 +868,16 @@
       return `<li><div><b>${esc(mName(x.from))}</b> מעביר ל<b>${esc(mName(x.to))}</b> <span class="amt">${money(x.amount)}</span></div>
         <div class="debt-actions">
           <a class="btn small wa" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">תזכורת בוואטסאפ</a>
-          <button class="btn small" data-settle="${i}">שולם ✓</button>
+          <button class="btn small needs-sync" data-settle="${i}">שולם ✓</button>
         </div></li>`;
     }).join("") : `<li class="empty" style="display:block">כולם מאוזנים 🎉</li>`;
+    // Same debts on every synced phone → same id → two "paid" taps for the same debt make ONE settlement
+    const stateKey = hashId([...state.expenses.map(e => e.id), ...state.settlements.map(s => s.id)].sort().join(","));
     $("debts").querySelectorAll("[data-settle]").forEach(btn => btn.onclick = () => {
+      if (!requireSync("סימון החזר")) return;
       const x = d[+btn.dataset.settle];
       btn.disabled = true; haptic(10);
-      const ref = doc(collection(db, "settlements"));
+      const ref = doc(db, "settlements", "p_" + hashId(`${stateKey}|${x.from}|${x.to}|${x.amount}`));
       write(setDoc(ref, { from:x.from, to:x.to, amount:x.amount, date:today(), createdAt:Date.now() }));
       toast(`${mName(x.from)} → ${mName(x.to)} ${money(x.amount)} נרשם ✓`, "ביטול", () => write(deleteDoc(ref)));
     });
@@ -848,6 +892,7 @@
   }
   $("manualForm").addEventListener("submit", ev => {
     ev.preventDefault();
+    if (!requireSync("רישום העברה")) return;
     const from = $("mFrom").value, to = $("mTo").value, amount = calc($("mAmt").value);
     if (from === to) return toast("צריך שני שותפים שונים");
     if (!(amount > 0)) return toast("סכום לא תקין");
@@ -964,23 +1009,24 @@
         html += `<li><div class="ic" title="${c.n}">${c.e}</div><div class="body"><div class="t">${esc(e.title)}</div>
           <div class="m"><span class="dot sm" style="background:${mColor(e.paidBy)}"></span> ${esc(mName(e.paidBy))} שילם · ${dfmt(e.date)} · ${who}${mine}</div></div>
           <div class="right"><div class="amt">${money(e.amount)}</div>
-          <button class="btn link" data-edit="${esc(e.id)}">עריכה</button><button class="btn link danger" data-del="expenses:${esc(e.id)}">מחיקה</button></div></li>`;
+          <button class="btn link needs-sync" data-edit="${esc(e.id)}">עריכה</button><button class="btn link danger needs-sync" data-del="expenses:${esc(e.id)}">מחיקה</button></div></li>`;
       } else {
         const s = it.x;
         html += `<li><div class="ic pay">💸</div><div class="body"><div class="t">החזר כסף</div>
           <div class="m">${esc(mName(s.from))} העביר ל${esc(mName(s.to))} · ${dfmt(s.date)}</div></div>
-          <div class="right"><div class="amt">${money(s.amount)}</div><button class="btn link danger" data-del="settlements:${esc(s.id)}">מחיקה</button></div></li>`;
+          <div class="right"><div class="amt">${money(s.amount)}</div><button class="btn link danger needs-sync" data-del="settlements:${esc(s.id)}">מחיקה</button></div></li>`;
       }
     });
     $("hist").innerHTML = html;
     $("hist").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+      if (!requireSync("מחיקה")) return;
       const k = b.dataset.del.indexOf(":"), c = b.dataset.del.slice(0, k), id = b.dataset.del.slice(k + 1);
       const rec = state[c].find(x => x.id === id); if (!rec) return;
       const { id: _, ...data } = rec;
       write(deleteDoc(doc(db, c, id)));
       toast("נמחק", "ביטול", () => write(setDoc(doc(db, c, id), data)));
     });
-    $("hist").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => startEdit(b.dataset.edit));
+    $("hist").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => { if (requireSync("עריכה")) startEdit(b.dataset.edit); });
   }
   $("monthSel").onchange = () => { monthFilter = $("monthSel").value; renderHistory(); };
 
@@ -1009,9 +1055,9 @@
     state.settlements.forEach(s => { used.add(s.from); used.add(s.to); });
     const ms = members();
     $("memList").innerHTML = ms.length ? ms.map(m => `<div class="mem"><span class="dot" style="background:${safeColor(m.color)}"></span><span style="flex:1">${esc(m.name)}</span>
-      ${used.has(m.id) ? '<span class="hint">יש לו רשומות</span>' : `<button class="btn link danger" data-rm="${esc(m.id)}">הסרה</button>`}</div>`).join("")
+      ${used.has(m.id) ? '<span class="hint">יש לו רשומות</span>' : `<button class="btn link danger needs-sync" data-rm="${esc(m.id)}">הסרה</button>`}</div>`).join("")
       : `<div class="empty">עוד אין שותפים</div>`;
-    $("memList").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => write(deleteDoc(doc(db, "members", b.dataset.rm))));
+    $("memList").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { if (requireSync("הסרת שותף")) write(deleteDoc(doc(db, "members", b.dataset.rm))); });
     const cur = me();
     $("meSel").innerHTML = `<option value="">— לא נבחר —</option>` + ms.map(m => `<option value="${esc(m.id)}" ${m.id === cur ? "selected" : ""}>${esc(m.name)}</option>`).join("");
   }
@@ -1047,7 +1093,9 @@
     // One atomic batch: the expense + removing the bought items it came from.
     // Not awaited: it is applied locally at once and syncs when there is reception.
     const batch = writeBatch(db);
-    batch.set(editingId ? doc(db, "expenses", editingId) : doc(collection(db, "expenses")), data);
+    // Converting the same bought items on two phones → same id → one expense, not two
+    const expId = editingId || (fromBought && fromBought.length ? "b_" + hashId([...fromBought].sort().join(",")) : null);
+    batch.set(expId ? doc(db, "expenses", expId) : doc(collection(db, "expenses")), data);
     (fromBought || []).forEach(id => batch.delete(doc(db, "groceries", id)));
     write(batch.commit());
     const wasEdit = !!editingId;
@@ -1130,6 +1178,7 @@
   $("memOverlay").addEventListener("click", e => { if (e.target === $("memOverlay")) closeMembers(); });
   $("memForm").addEventListener("submit", ev => {
     ev.preventDefault();
+    if (!requireSync("הוספת שותף")) return;
     const name = $("memInput").value.trim(); if (!name) return;
     if (state.members.some(m => m.name.trim().toLowerCase() === name.toLowerCase())) return toast("השם כבר קיים");
     const used = new Set(state.members.map(m => m.color));
@@ -1150,7 +1199,8 @@
   $("qtyMinus").addEventListener("click", () => { currentQty = Math.max(currentQty - 1, 1); $("qtyDisplay").textContent = currentQty; });
   $("groupToggle").onclick = () => { grouped = !grouped; store.set("makolet_grouped", grouped ? "1" : "0"); renderList(currentItems); };
 
-  onSnapshot(query(groceriesCol, orderBy("createdAt", "asc")), snapshot => {
+  onSnapshot(query(groceriesCol, orderBy("createdAt", "asc")), { includeMetadataChanges: true }, snapshot => {
+    trackMeta("groceries", snapshot);
     currentItems = snapshot.docs.map(d => ({ ...d.data(), id: d.id })).filter(VALID.groceries)
       .map(i => ({ ...i, name: String(i.name).slice(0, 80), qty: Math.min(Math.max(parseInt(i.qty) || 1, 1), 99), bought: i.bought === true }));
     renderList(currentItems);
@@ -1219,18 +1269,29 @@
   }
 
   function addNames(names, qty) {
-    const pendingNames = new Set(currentItems.filter(i => !i.bought).map(i => i.name.toLowerCase()));
-    const seen = new Set(); let added = 0, skipped = 0;
+    const pendingByName = new Map(currentItems.filter(i => !i.bought).map(i => [i.name.trim().toLowerCase(), i]));
+    const seen = new Set(); let added = 0, skipped = 0, bumped = null;
     const batch = writeBatch(db);
     for (const raw of names) {
-      const name = raw.slice(0, 80), key = name.toLowerCase();
-      if (names.length > 1 && (pendingNames.has(key) || seen.has(key))) { skipped++; continue; } // skip duplicates on multi-add
+      const name = raw.slice(0, 80).trim(), key = name.toLowerCase();
+      if (!name || seen.has(key)) continue;
       seen.add(key);
-      batch.set(doc(groceriesCol), { name, qty, bought: false, cat: categorize(name), addedBy: me() || null, createdAt: serverTimestamp() });
-      bumpFreq(name); added++;
+      const existing = pendingByName.get(key);
+      if (existing) {
+        if (names.length > 1) { skipped++; continue; }                 // pasted list: keep what's already there
+        // single add of an item already on the list: raise its quantity atomically (two phones = +2, never a lost update)
+        batch.update(doc(groceriesCol, existing.id), { qty: existing.qty + qty > 99 ? 99 : increment(qty) });
+        bumped = { name, qty: Math.min(existing.qty + qty, 99) };
+      } else {
+        // id from the name: the same item added on two phones (even offline) lands on ONE document
+        batch.set(doc(groceriesCol, itemId(name)), { name, qty, bought: false, cat: categorize(name), addedBy: me() || null, createdAt: serverTimestamp() });
+        added++;
+      }
+      bumpFreq(name);
     }
-    if (added) write(batch.commit()); // one atomic write, applied locally at once (works offline)
-    if (names.length > 1) toast(skipped ? `נוספו ${added} פריטים (${skipped} כבר ברשימה)` : `נוספו ${added} פריטים`);
+    if (added || bumped) write(batch.commit()); // one atomic write, applied locally at once (works offline)
+    if (bumped) toast(`"${bumped.name}" כבר ברשימה — עכשיו ×${bumped.qty}`);
+    else if (names.length > 1) toast(skipped ? `נוספו ${added} פריטים (${skipped} כבר ברשימה)` : `נוספו ${added} פריטים`);
   }
   // Restoring a deleted item: a still-pending server timestamp comes back as null
   const restorable = data => ({ ...data, createdAt: data.createdAt ?? serverTimestamp() });
@@ -1262,6 +1323,7 @@
 
   // Bought items → expense
   $("toExpenseBtn").addEventListener("click", () => {
+    if (!requireSync("רישום הנקנה כהוצאה")) return;
     const bought = currentItems.filter(i => i.bought);
     if (!bought.length) return;
     if (!state.members.length) { openMembers(); return toast("קודם מוסיפים שותפים"); }
@@ -1398,7 +1460,7 @@
     const id = li.dataset.id, bought = li.dataset.bought === "true";
     const item = currentItems.find(i => i.id === id);
     if (e.target.closest(".toggle-btn") && item) toggleItem(item);
-    else if (e.target.closest(".item-qty") && !bought && item) write(updateDoc(doc(db, "groceries", id), { qty: Math.min(item.qty + 1, 99) }));
+    else if (e.target.closest(".item-qty") && !bought && item) write(updateDoc(doc(db, "groceries", id), { qty: item.qty >= 99 ? 99 : increment(1) })); // atomic: two taps on two phones = +2
     else if (e.target.closest(".delete-btn") && item) deleteItem(item, li);
   }
   $("pendingList").addEventListener("click", handleClick);

@@ -29,6 +29,11 @@ Access is behind a simple shared password (`PASSWORD` in `index.html`).
 - iPhone (Safari): Share → *Add to Home Screen* (the app shows these steps the first time)
 - Opens full-screen with its own icon, loads with no reception (`sw.js`), and long-pressing the icon offers shortcuts to the shopping list or a new expense
 
+**Offline & conflicts**
+- Safe offline (saved on the phone, synced later): everything in the shopping list, and logging a new expense — each is its own document, so nothing collides.
+- Needs a live, synced connection: "paid", manual transfers, turning bought items into an expense, editing/deleting history, adding/removing roommates — these depend on everyone seeing the same numbers. "Synced" is taken from Firestore's own metadata (`fromCache`), not just `navigator.onLine`.
+- Built-in de-duplication: the same item added on two phones is one document (id from the name); quantity taps use atomic `increment()`; "paid" for the same debt and "bought → expense" for the same items get deterministic ids, so doing it on two phones at once still writes one record.
+
 When deploying a change to anything other than `index.html`, bump `VERSION` in `sw.js` so installed copies refresh their cache.
 
 ---
